@@ -1,4 +1,5 @@
 #include "bed.h"
+#include "stdio.h"
 
 int FILE_OFFSET = 3;
 
@@ -8,6 +9,14 @@ typedef struct
     int stop;
     int step;
 } Slice;
+
+typedef struct
+{
+    int* rows;
+    int* cols;
+    int nrows;
+    int ncols;
+} FancyIdx;
 
 typedef struct
 {
@@ -25,22 +34,17 @@ typedef struct
     int s;
 } BitIdx;
 
-int row_size(int* shape)
-{
-    return shape[1] / 4;
-}
-
-void convert_idx_itby(int* shape, ItemIdx* idx, ByteIdx* bydx)
+void _convert_idx_itby(int* shape, ItemIdx* idx, ByteIdx* bydx)
 {
     bydx->s = FILE_OFFSET + ((shape[1] + 3)/ 4) * idx->r + idx->c / 4;
 }
 
-void convert_idx_itbi(int* shape, ItemIdx* idx, BitIdx* bidx)
+void _convert_idx_itbi(int* shape, ItemIdx* idx, BitIdx* bidx)
 {
     bidx->s = (idx->c % 4) * 2;
 }
 
-char get_snp(char v, BitIdx* bidx)
+char _get_snp(char v, BitIdx* bidx)
 {
     char f = (v >> bidx->s) & 3;
     char bit1 =  f & 1;
@@ -54,14 +58,14 @@ char get_snp(char v, BitIdx* bidx)
 char _read_item(FILE* fp, int* shape, ItemIdx* idx)
 {
     ByteIdx bydx;
-    convert_idx_itby(shape, idx, &bydx);
+    _convert_idx_itby(shape, idx, &bydx);
 
     BitIdx bidx;
-    convert_idx_itbi(shape, idx, &bidx);
+    _convert_idx_itbi(shape, idx, &bidx);
 
     fseek(fp, bydx.s, SEEK_SET);
 
-    char item = get_snp(fgetc(fp), &bidx);
+    char item = _get_snp(fgetc(fp), &bidx);
 
     return item;
 }
@@ -111,7 +115,7 @@ void _read_col_slice(FILE* fp, int* shape, int col, Slice* row, long* matrix)
 }
 
 void
-bed_read_row_slice(char* filepath, int nrows, int ncols, int row,
+bed_row_slice(char* filepath, int nrows, int ncols, int row,
                    int c_start, int c_stop, int c_step,
                    long* matrix)
 {
@@ -124,7 +128,7 @@ bed_read_row_slice(char* filepath, int nrows, int ncols, int row,
 }
 
 void
-bed_read_col_slice(char* filepath, int nrows, int ncols, int col,
+bed_column_slice(char* filepath, int nrows, int ncols, int col,
                    int r_start, int r_stop, int r_step,
                    long* matrix)
 {
@@ -137,7 +141,7 @@ bed_read_col_slice(char* filepath, int nrows, int ncols, int col,
 }
 
 void
-bed_read_slice(char* filepath, int nrows, int ncols,
+bed_slice(char* filepath, int nrows, int ncols,
            int r_start, int r_stop, int r_step,
            int c_start, int c_stop, int c_step,
            long* matrix)
@@ -152,13 +156,13 @@ bed_read_slice(char* filepath, int nrows, int ncols,
 }
 
 void
-bed_read(char* filepath, int nrows, int ncols, long* matrix)
+bed_entirely(char* filepath, int nrows, int ncols, long* matrix)
 {
-    bed_read_slice(filepath, nrows, ncols, 0, nrows, 1, 0, ncols, 1, matrix);
+    bed_slice(filepath, nrows, ncols, 0, nrows, 1, 0, ncols, 1, matrix);
 }
 
 int
-bed_read_item(char* filepath, int nrows, int ncols, int row, int col)
+bed_item(char* filepath, int nrows, int ncols, int row, int col)
 {
     int shape[2] = {nrows, ncols};
     ItemIdx idx = {row, col};
@@ -171,14 +175,32 @@ bed_read_item(char* filepath, int nrows, int ncols, int row, int col)
 }
 
 int
-bed_major(char* filepath)
+bed_snp_major(char* filepath)
 {
     FILE* fp = fopen(filepath, "rb");
     fseek(fp, 2, SEEK_SET);
     char item = fgetc(fp);
     fclose(fp);
-
     return item;
-    // 00000000 individual major: SNP 1, SNP 2, ...
-    // 00000001 SNP major: individual 1, individual 2, ...
+}
+
+void
+bed_fancyidx(char* filepath, int nrows, int ncols,
+             int rn, long* rows, int cn, long* cols, long* matrix)
+{
+    int r, c;
+    int shape[2] = {nrows, ncols};
+    ItemIdx idx;
+
+    FILE* fp = fopen(filepath, "rb");
+    for (r = 0; r < rn; r++)
+    {
+        for (c = 0; c < cn; c++)
+        {
+            idx.r = rows[r];
+            idx.c = cols[c];
+            matrix[r * cn + c] = (long) _read_item(fp, shape, &idx);
+        }
+    }
+    fclose(fp);
 }
