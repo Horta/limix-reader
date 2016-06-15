@@ -37,6 +37,9 @@ class Vector(object):
     def __str__(self):
         return bytes(self._data)
 
+    def __array__(self):
+        return self._data
+
     @property
     def dtype(self):
         return npy2py_type(self._data.dtype)

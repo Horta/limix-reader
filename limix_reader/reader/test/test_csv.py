@@ -19,4 +19,11 @@ def test_read():
          [ 1.,  0.,  1.,  1.,  1.],
          [ 2.,  2.,  0.,  1.,  0.]]
 
+    R = array(R)
     assert_array_equal(asarray(table), array(R))
+
+    assert_array_equal(asarray(table["column_name_0"]), R[:,0])
+    assert_array_equal(asarray(table["column_name_1"]), R[:,1])
+    assert_array_equal(asarray(table["column_name_2"]), R[:,2])
+    assert_array_equal(asarray(table["column_name_3"]), R[:,3])
+    assert_array_equal(asarray(table["column_name_4"]), R[:,4])
