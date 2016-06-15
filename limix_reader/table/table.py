@@ -53,8 +53,8 @@ class Table(object):
     def __getitem__(self, colname):
         return Column(colname, self.index_values, self._df[colname].values)
 
-    def __getattr__(self, colname):
-        return Column(colname, self.index_values, self._df[colname].values)
+    # def __getattr__(self, colname):
+    #     return Column(colname, self.index_values, self._df[colname].values)
 
     @property
     def shape(self):
@@ -68,7 +68,7 @@ class Table(object):
     def dtypes(self):
         return self._df.dtypes
 
-    def as_matrix(self):
+    def __array__(self):
         return self._df.as_matrix()
 
     def __repr__(self):
