@@ -27,3 +27,5 @@ def test_read():
     assert_array_equal(asarray(table["column_name_2"]), R[:,2])
     assert_array_equal(asarray(table["column_name_3"]), R[:,3])
     assert_array_equal(asarray(table["column_name_4"]), R[:,4])
+
+    print(table["column_name_0"] == 0)

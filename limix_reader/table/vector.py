@@ -44,6 +44,12 @@ class Vector(object):
     def dtype(self):
         return npy2py_type(self._data.dtype)
 
+    def __eq__(self, that):
+        if isinstance(that, Vector):
+            raise NotImplementedError
+        import ipdb; ipdb.set_trace()
+        return self._map.keys()[self._data == that]
+
 class VectorView(MutableMapping):
     def __init__(self, _ref, map_):
         self._ref, self._map = _ref, map_
