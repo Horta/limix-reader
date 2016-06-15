@@ -28,4 +28,14 @@ def test_read():
     assert_array_equal(asarray(table["column_name_3"]), R[:,3])
     assert_array_equal(asarray(table["column_name_4"]), R[:,4])
 
-    print(table["column_name_0"] == 0)
+    sample_ids = table["column_name_0"] == 0
+    assert_array_equal(table["column_name_0"][sample_ids], [0, 0])
+
+    sample_ids = table["column_name_0"] != 0
+    assert_array_equal(table["column_name_0"][sample_ids], [1, 2])
+
+    sample_ids = table["column_name_0"] >= 0
+    assert_array_equal(table["column_name_0"][sample_ids], [0, 0, 1, 2])
+
+    sample_ids = table["column_name_0"]  > 0
+    assert_array_equal(table["column_name_0"][sample_ids], [1, 2])

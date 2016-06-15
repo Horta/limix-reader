@@ -1,26 +1,31 @@
 from collections import MutableMapping
+from collections import OrderedDict as odict
 
 from numpy import asarray
+from numpy import vectorize
 from numpy import atleast_1d
 
 from ..util import npy2py_cast
 from ..util import npy2py_type
 
+# def __npy_map(v, d):
+#     return d[v]
+#
+# _npy_map = vectorize(__npy_map)
+
 class Vector(object):
     def __init__(self, labels, values):
-        cvalues = [npy2py_cast(v) for v in values]
-        self._map = dict(zip(labels, cvalues))
+        labels = asarray(labels).astype(npy2py_type(type(labels[0])))
+        self._labels = labels
 
-        self._imap = dict()
-        for i in range(len(cvalues)):
-            if cvalues[i] not in self._imap:
-                self._imap[cvalues[i]] = []
-            self._imap[cvalues[i]].append(labels[i])
+        values = asarray(values).astype(npy2py_type(type(values[0])))
+        self._values = values
 
-        self._data = asarray(values)
+        n = len(values)
+        self._map = odict([(labels[i], values[i]) for i in range(n)])
 
     def __len__(self):
-        return len(self._data)
+        return len(self._values)
 
     def __getitem__(self, args):
         if npy2py_type(type(args)) in [int, bytes, float]:
@@ -32,23 +37,37 @@ class Vector(object):
         return VectorView(self, self._map)
 
     def __repr__(self):
-        return repr(self._data)
+        return repr(self._values)
 
     def __str__(self):
-        return bytes(self._data)
+        return bytes(self._values)
 
     def __array__(self):
-        return self._data
+        return self._values
 
     @property
     def dtype(self):
-        return npy2py_type(self._data.dtype)
+        return npy2py_type(self._values.dtype)
 
     def __eq__(self, that):
         if isinstance(that, Vector):
             raise NotImplementedError
-        import ipdb; ipdb.set_trace()
-        return self._map.keys()[self._data == that]
+        return self._labels[self._values == that]
+
+    def __ne__(self, that):
+        if isinstance(that, Vector):
+            raise NotImplementedError
+        return self._labels[self._values != that]
+
+    def __ge__(self, that):
+        if isinstance(that, Vector):
+            raise NotImplementedError
+        return self._labels[self._values >= that]
+
+    def __gt__(self, that):
+        if isinstance(that, Vector):
+            raise NotImplementedError
+        return self._labels[self._values > that]
 
 class VectorView(MutableMapping):
     def __init__(self, _ref, map_):
