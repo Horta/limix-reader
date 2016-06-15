@@ -2,8 +2,8 @@ from __future__ import absolute_import
 
 from pandas import read_csv
 
-from ..data import Table
-from ..data import Column
+from ..table import Table
+from ..table import Column
 
 def reader(filepath, dtype=float, row_header=False, col_header=False):
 
