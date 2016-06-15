@@ -1,11 +1,18 @@
 from pandas import read_csv
 
-from .plink import read_item
-from .plink import read
+from bidict import bidict
+
+from numpy import arange
+from numpy import empty
+
+from .plink import read_bed_item
+# from .plink.bed import entirely as bed_entirely
+from .plink import read_bed_intidx
 
 from .plink import read_map
 
 from ..matrix import MatrixInterface
+from ..matrix import normalize_getitem_args
 from ..matrix import MatrixView
 from ..table import Table
 
@@ -34,34 +41,20 @@ class BedPath(MatrixInterface):
         self._sample_ids = sample_ids
         self._marker_ids = marker_ids
 
-    def item(self, *args):
-        index_msg_err = "Provide an integer or a pair of integers."
+        n = len(self._sample_ids)
+        p = len(self._marker_ids)
 
-        if len(args) == 0:
-            raise IndexError(index_msg_err)
+        self._sample_map = bidict(zip(self._sample_ids, arange(n, dtype=int)))
+        self._marker_map = bidict(zip(self._marker_ids, arange(p, dtype=int)))
 
-        if len(args) == 1:
-            raise NotImplementedError
-
-        if len(args) == 2:
-            return read_item(self._filepath, args[0], args[1], self.shape)
-
-        raise IndexError(index_msg_err)
-
-    # def __getitem__(self, args):
-    #     mslice = normalize_access(args, self.shape)
-    #     if isinstance(mslice[0], int) and isinstance(mslice[1], Slice):
-    #         return read_row_slice(self._filepath, mslice[0], mslice[1].start,
-    #                               mslice[1].stop, mslice[1].step, self.shape)
-    #     elif isinstance(mslice[1], int) and isinstance(mslice[0], Slice):
-    #         return read_col_slice(self._filepath, mslice[1], mslice[0].start,
-    #                               mslice[0].stop, mslice[0].step, self.shape)
-    #     # return read_mslice(mslice)
-    #     raise NotImplementedError
+    def item(self, sample_id, marker_id):
+        r = self._sample_map[sample_id]
+        c = self._marker_map[marker_id]
+        return read_bed_item(self._filepath, r, c, self.shape)
 
     def __getitem__(self, args):
-        mslice = normalize_access(args, self.shape)
-        return MatrixView(self, mslice)
+        sample_ids, marker_ids = normalize_getitem_args(args)
+        return MatrixView(self, sample_ids, marker_ids)
 
     @property
     def shape(self):
@@ -78,14 +71,19 @@ class BedPath(MatrixInterface):
         return bytes(self.__array__())
 
     def __array__(self, *args, **kwargs):
-        import ipdb; ipdb.set_trace()
-        if len(args) == 0:
-            if 'index_list' in kwargs:
-                mslice = merge_mslices(kwargs['index_list'])
-                return read(self._filepath, self.shape)
-            else:
-                return read(self._filepath, self.shape)
-        raise NotImplementedError
+        kwargs = dict(kwargs)
+
+        if 'sample_ids' not in kwargs:
+            kwargs['sample_ids'] = self._sample_ids
+            kwargs['marker_ids'] = self._marker_ids
+
+        sample_idx = [self._sample_map[si] for si in kwargs['sample_ids']]
+        marker_idx = [self._marker_map[mi] for mi in kwargs['marker_ids']]
+
+        G = empty((len(sample_idx), len(marker_idx)))
+        read_bed_intidx(self._filepath, sample_idx, marker_idx, self.shape, G)
+
+        return G
 
     @property
     def sample_ids(self):

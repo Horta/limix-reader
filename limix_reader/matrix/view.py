@@ -1,10 +1,11 @@
 from .interface import MatrixInterface
 
 class MatrixView(MatrixInterface):
-    def __init__(self, ref, index):
+    def __init__(self, ref, sample_ids, marker_ids):
         super(MatrixView, self).__init__()
         self._ref = ref
-        self._index = index
+        self._sample_ids = sample_ids
+        self._marker_ids = marker_ids
 
     def item(self, *args):
         return self._self(args, [])
@@ -31,21 +32,18 @@ class MatrixView(MatrixInterface):
         return self._ref.dtype
 
     def __repr__(self):
-        import ipdb; ipdb.set_trace()
         return repr(self.__array__())
 
     def __str__(self):
-        import ipdb; ipdb.set_trace()
         return bytes(self.__array__())
 
     def __array__(self, *args, **kwargs):
-        import ipdb; ipdb.set_trace()
         kwargs = dict(kwargs)
 
-        if 'index_list' not in kwargs:
-            kwargs['index_list'] = []
+        if 'sample_ids' not in kwargs:
+            kwargs['sample_ids'] = self._sample_ids
+            kwargs['marker_ids'] = self._marker_ids
 
-        kwargs['index_list'] = [self._index] + kwargs['index_list']
         return self._ref.__array__(*args, **kwargs)
 
     @property

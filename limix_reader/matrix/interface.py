@@ -2,10 +2,10 @@ class MatrixInterface(object):
     def __init__(self):
         pass
 
-    def item(self, *args):
+    def item(self, sample_id, marker_id):
         raise NotImplementedError
 
-    def __getitem__(self, args):
+    def __getitem__(self, sample_ids, marker_ids):
         raise NotImplementedError
 
     @property

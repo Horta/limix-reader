@@ -51,7 +51,7 @@ def setup_package():
         zip_safe=True,
         install_requires=install_requires,
         setup_requires=setup_requires,
-        cffi_modules=["limix_reader/reader/plink/cbed/bed.py:ffi"],
+        cffi_modules=["limix_reader/reader/plink/cbed/interface.py:ffi"],
     )
 
     if module_exists("distutils.command.bdist_conda"):
