@@ -39,3 +39,14 @@ def test_read():
 
     sample_ids = table["column_name_0"]  > 0
     assert_array_equal(table["column_name_0"][sample_ids], [1, 2])
+
+    sample_ids = table["column_name_0"] == table["column_name_4"]
+    assert_array_equal(sample_ids, [0, 1, 2])
+
+    sample_ids = table["column_name_0"] >= table["column_name_1"]
+    assert_array_equal(sample_ids, [2, 3])
+    assert_array_equal(table["column_name_0"][sample_ids], [1, 2])
+
+    sample_ids = table["column_name_0"] > table["column_name_1"]
+    assert_array_equal(sample_ids, [2])
+    assert_array_equal(table["column_name_0"][sample_ids], [1])

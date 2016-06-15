@@ -4,14 +4,16 @@ from collections import OrderedDict as odict
 from numpy import asarray
 from numpy import vectorize
 from numpy import atleast_1d
+from numpy import intersect1d
 
 from ..util import npy2py_cast
 from ..util import npy2py_type
+from ..util import define_binary_operators
 
-# def __npy_map(v, d):
-#     return d[v]
-#
-# _npy_map = vectorize(__npy_map)
+def __npy_map(v, d):
+    return d[v]
+
+_npy_map = vectorize(__npy_map)
 
 class Vector(object):
     def __init__(self, labels, values):
@@ -49,25 +51,20 @@ class Vector(object):
     def dtype(self):
         return npy2py_type(self._values.dtype)
 
-    def __eq__(self, that):
+    def __compare__(self, that, opname):
         if isinstance(that, Vector):
-            raise NotImplementedError
-        return self._labels[self._values == that]
+            labels_lhs = self._labels
+            labels_rhs = that._labels
+            labels = intersect1d(labels_lhs, labels_rhs)
 
-    def __ne__(self, that):
-        if isinstance(that, Vector):
-            raise NotImplementedError
-        return self._labels[self._values != that]
+            vals_lhs = _npy_map(labels, self._map)
+            vals_rhs = _npy_map(labels, that._map)
 
-    def __ge__(self, that):
-        if isinstance(that, Vector):
-            raise NotImplementedError
-        return self._labels[self._values >= that]
+            return self._labels[getattr(vals_lhs, opname)(vals_rhs)]
 
-    def __gt__(self, that):
-        if isinstance(that, Vector):
-            raise NotImplementedError
-        return self._labels[self._values > that]
+        return self._labels[getattr(self._values, opname)(that)]
+
+define_binary_operators(Vector, '__compare__')
 
 class VectorView(MutableMapping):
     def __init__(self, _ref, map_):

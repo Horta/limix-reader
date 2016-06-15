@@ -8,7 +8,7 @@ class Column(Vector):
         self.name = name
 
     def __repr__(self):
-        return "Column(" + bytes(self._data) + ")"
+        return "Column(" + bytes(self._values) + ")"
 
     def __str__(self):
-        return "Column(" + bytes(self._data) + ")"
+        return "Column(" + bytes(self._values) + ")"
