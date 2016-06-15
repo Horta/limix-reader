@@ -3,7 +3,8 @@ from numpy import where
 from pandas import DataFrame
 
 from .column import Column
-from ..util.type import npy2py_type
+from ..util import npy2py_type
+from ..util import make_sure_list
 
 class Table(object):
     def __init__(self, df=None):
@@ -53,8 +54,9 @@ class Table(object):
     def __getitem__(self, colname):
         return Column(colname, self.index_values, self._df[colname].values)
 
-    # def __getattr__(self, colname):
-    #     return Column(colname, self.index_values, self._df[colname].values)
+    def loc(self, index_values):
+        index_values = make_sure_list(index_values)
+        return TableView(self, index_values)
 
     @property
     def shape(self):
@@ -68,11 +70,68 @@ class Table(object):
     def dtypes(self):
         return self._df.dtypes
 
-    def __array__(self):
-        return self._df.as_matrix()
+    def __array__(self, index_values=None):
+        if index_values is None:
+            return self._df.__array__()
+        return self._df.loc[index_values].__array__()
 
     def __repr__(self):
         return repr(self._df)
 
     def __str__(self):
         return bytes(self._df)
+
+class TableView(object):
+    def __init__(self, ref, index_values):
+        self._ref, self._index_values = ref, index_values
+
+    @property
+    def index_name(self):
+        return self._ref.index_name
+
+    @index_name.setter
+    def index_name(self, v):
+        self._ref.index_name = v
+
+    @property
+    def index_values(self):
+        return self._ref.index_values
+
+    @index_values.setter
+    def index_values(self, values):
+        self._ref.index_values = values
+
+    @property
+    def columns(self):
+        return self._ref.columns
+
+    def __getitem__(self, colname, index_values=None):
+        if index_values is None:
+            index_values = self._index_values
+        return self._ref.__getitem__(colname, index_values)
+
+    def loc(self, index_values):
+        pass
+
+    @property
+    def shape(self):
+        return self._df.shape
+
+    @property
+    def ndim(self):
+        return 2
+
+    @property
+    def dtypes(self):
+        return self._df.dtypes
+
+    def __array__(self, index_values=None):
+        if index_values is None:
+            index_values = self._index_values
+        return self._ref.__array__(index_values=self._index_values)
+
+    def __repr__(self):
+        return repr(self.__array__())
+
+    def __str__(self):
+        return bytes(self.__array__())

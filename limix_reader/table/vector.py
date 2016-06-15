@@ -67,8 +67,8 @@ class Vector(object):
 define_binary_operators(Vector, '__compare__')
 
 class VectorView(MutableMapping):
-    def __init__(self, _ref, map_):
-        self._ref, self._map = _ref, map_
+    def __init__(self, ref, map_):
+        self._ref, self._map = ref, map_
 
     def __getitem__(self, key):
         if key in self._map.keys():

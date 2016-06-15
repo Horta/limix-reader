@@ -4,6 +4,7 @@ from os.path import realpath
 
 from numpy import array
 from numpy import asarray
+from numpy import vstack
 from numpy.testing import assert_array_equal
 
 def test_read():
@@ -50,3 +51,5 @@ def test_read():
     sample_ids = table["column_name_0"] > table["column_name_1"]
     assert_array_equal(sample_ids, [2])
     assert_array_equal(table["column_name_0"][sample_ids], [1])
+
+    assert_array_equal(table.loc([0, 3]), vstack([R[0,:], R[3,:]]))
