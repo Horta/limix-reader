@@ -4,8 +4,8 @@ from numpy import asarray
 from numpy import arange
 from numpy import atleast_2d
 
-from ..data import Table
-from ..data import Column
+from ..table import Table
+from ..table import Column
 from ..util.type import npy2py_type
 
 def reader(filepath, itempath, dtype=None):

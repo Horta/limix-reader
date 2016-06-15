@@ -1,6 +1,6 @@
 from pandas import read_csv
 
-from ..data import Table
+from ...table import Table
 
 def read_map(filepath):
     column_names = ['chromosome', 'snp_id', 'genetic_distance',

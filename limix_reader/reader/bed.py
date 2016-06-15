@@ -1,19 +1,13 @@
 from pandas import read_csv
 
-from .cplink import read_item
-from .cplink import read_row_slice
-from .cplink import read_col_slice
-from .cplink import read_slice
-from .cplink import read
+from .plink import read_item
+from .plink import read
 
-from .map import read_map
+from .plink import read_map
 
-from ..data import Slice
-from ..data.matrix.index import merge_mslices
-from ..data import MatrixInterface
-from ..data import MatrixView
-from ..data import normalize_access
-from ..data import Table
+from ..matrix import MatrixInterface
+from ..matrix import MatrixView
+from ..table import Table
 
 def _read_fam(filepath):
     column_names = ['family_id', 'individual_id', 'paternal_id', 'maternal_id',

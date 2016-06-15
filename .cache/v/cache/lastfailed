@@ -1,0 +1,6 @@
+{
+  "limix_reader/reader/test/test_bed.py": true, 
+  "limix_reader/reader/test/test_csv.py": true, 
+  "limix_reader/reader/test/test_h5.py": true, 
+  "limix_reader/reader/test/test_ped.py": true
+}

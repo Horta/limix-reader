@@ -5,9 +5,9 @@ from numpy import empty
 
 from pandas import read_csv
 
-from .map import read_map
-from ..data import Table
-from ..data import NPyMatrix
+from .plink import read_map
+from ..table import Table
+from ..matrix import NPyMatrix
 
 def _read_ped_genotype(M):
     nsnps = M.shape[1] // 2
