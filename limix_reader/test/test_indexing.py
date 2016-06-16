@@ -5,6 +5,7 @@ from os.path import realpath
 from numpy import nan
 from numpy.testing import assert_equal
 from numpy.testing import assert_raises
+from numpy.testing import assert_array_equal
 
 import limix_reader as limr
 
@@ -46,17 +47,13 @@ def test_ids():
     with assert_raises(IndexError):
         G.item(0, 1)
 
-    sample_ids = table1['column_name_0'] >= table1['column_name_1']
-    print(sample_ids)
-
     mtable1 = limr.reader.csv(join(root, '2d_array_bytes.csv'), row_header=True,
                               col_header=True)
-    print(mtable1)
-    print(mtable1['color'] == 'red')
-    print(mtable1['temperature'] > 0)
 
     mtable2 = limr.reader.csv(join(root, '2d_array_bytes_2.csv'), row_header=True,
                               col_header=True)
 
     mtable = mtable1.merge(mtable2)
-    print(mtable['status'])
+    assert_array_equal(mtable['status'], ['paused', 'paused', 'running',
+                                          'paused', 'running', 'running'])
+    assert_array_equal(mtable['temperature'], [ 10.,  -3., -13.,  33.])

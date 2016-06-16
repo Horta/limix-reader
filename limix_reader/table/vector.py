@@ -26,6 +26,14 @@ class Vector(object):
         n = len(values)
         self._map = odict([(labels[i], values[i]) for i in range(n)])
 
+    def merge(self, that):
+        from .mvector import MVector
+        return MVector(self, that)
+
+    @property
+    def index_values(self):
+        return self._labels
+
     def __len__(self):
         return len(self._values)
 
@@ -39,10 +47,10 @@ class Vector(object):
         return VectorView(self, self._map)
 
     def __repr__(self):
-        return repr(self._values)
+        return repr(self.__array__())
 
     def __str__(self):
-        return bytes(self._values)
+        return bytes(self.__array__())
 
     def __array__(self):
         return self._values
@@ -69,6 +77,10 @@ define_binary_operators(Vector, '__compare__')
 class VectorView(MutableMapping):
     def __init__(self, ref, map_):
         self._ref, self._map = ref, map_
+
+    @property
+    def index_values(self):
+        return self._ref.index_values
 
     def __getitem__(self, key):
         if key in self._map.keys():

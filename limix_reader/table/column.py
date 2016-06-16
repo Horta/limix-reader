@@ -12,3 +12,7 @@ class Column(Vector):
 
     def __str__(self):
         return "Column(" + bytes(self._values) + ")"
+
+    def merge(self, that):
+        from .mcolumn import MColumn
+        return MColumn(self, that)
