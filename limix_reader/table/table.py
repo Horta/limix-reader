@@ -7,9 +7,8 @@ from pandas import DataFrame
 from .column import Column
 from ..util import npy2py_type
 from ..util import make_sure_list
-from .interface import TableInterface
 
-class Table(TableInterface):
+class Table(object):
     def __init__(self, df=None):
         super(Table, self).__init__()
         self._df = DataFrame() if df is None else df
@@ -90,62 +89,6 @@ class Table(TableInterface):
     def __str__(self):
         return bytes(self._df)
 
-class TableView(object):
-    def __init__(self, ref, index_values=None, column_names=None):
-        self._ref = ref
-        self._index_values = index_values
-        self._column_values = column_names
-
-    @property
-    def index_name(self):
-        return self._ref.index_name
-
-    @index_name.setter
-    def index_name(self, v):
-        self._ref.index_name = v
-
-    @property
-    def index_values(self):
-        if self._index_values is None:
-            return self._ref.index_values
-        return self._index_values
-
-    @index_values.setter
-    def index_values(self, values):
-        self._ref.index_values = values
-
-    @property
-    def columns(self):
-        return self._ref.columns
-
-    def __getitem__(self, colname, index_values=None):
-        if index_values is None:
-            index_values = self._index_values
-        return self._ref.__getitem__(colname, index_values)
-
-    def loc(self, index_values):
-        pass
-
-    @property
-    def shape(self):
-        return self._df.shape
-
-    @property
-    def ndim(self):
-        return 2
-
-    @property
-    def dtypes(self):
-        return self._df.dtypes
-
-    def __array__(self, *args, **kwargs):
-        kwargs = dict(kwargs)
-        if 'index_values' not in kwargs:
-            kwargs['index_values'] = self._index_values
-        return self._ref.__array__(*args, **kwargs)
-
-    def __repr__(self):
-        return repr(self.__array__())
-
-    def __str__(self):
-        return bytes(self.__array__())
+    def merge(self, that):
+        from .mtable import MTable
+        return MTable(self, that)
