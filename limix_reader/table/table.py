@@ -1,3 +1,5 @@
+from collections import Iterable
+
 from numpy import where
 
 from pandas import DataFrame
@@ -53,8 +55,12 @@ class Table(TableInterface):
 
         self._df.index.name = index_name
 
-    def __getitem__(self, colname):
-        return Column(colname, self.index_values, self._df[colname].values)
+    def __getitem__(self, args):
+        if isinstance(args, bytes):
+            return Column(args, self.index_values, self._df[args].values)
+        if isinstance(args, Iterable):
+            return TableView(column_names=args)
+        return Column(args, self.index_values, self._df[args].values)
 
     def loc(self, index_values):
         index_values = make_sure_list(index_values)
@@ -85,8 +91,10 @@ class Table(TableInterface):
         return bytes(self._df)
 
 class TableView(object):
-    def __init__(self, ref, index_values):
-        self._ref, self._index_values = ref, index_values
+    def __init__(self, ref, index_values=None, column_names=None):
+        self._ref = ref
+        self._index_values = index_values
+        self._column_values = column_names
 
     @property
     def index_name(self):
@@ -98,7 +106,9 @@ class TableView(object):
 
     @property
     def index_values(self):
-        return self._ref.index_values
+        if self._index_values is None:
+            return self._ref.index_values
+        return self._index_values
 
     @index_values.setter
     def index_values(self, values):

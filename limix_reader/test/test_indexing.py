@@ -3,7 +3,9 @@ from os.path import join
 from os.path import realpath
 
 from numpy import nan
+from numpy import all
 from numpy import asarray
+from numpy.ma import masked_invalid
 from numpy.testing import assert_equal
 from numpy.testing import assert_raises
 from numpy.testing import assert_array_equal
@@ -74,11 +76,30 @@ def test_zebra():
     assert_equal(bed_sample_tbl.index_name, ped_sample_tbl.index_name)
     assert_array_equal(bed_sample_tbl.index_values,
                        ped_sample_tbl.index_values)
-
     assert_array_equal(bed_sample_tbl.columns, ped_sample_tbl.columns)
 
-    bedG = asarray(bed_G)
-    pedG = asarray(ped_G)
     import ipdb; ipdb.set_trace()
-    bed_G.unphased_equal(ped_G)
-    # assert_equal(bed_G, ped_G)
+    ped_marker_tbl = ped_marker_tbl[bed_marker_tbl.columns]
+    ped_marker_tbl.index_name
+    assert_array_equal(bed_marker_tbl, ped_marker_tbl)
+    assert_equal(bed_marker_tbl.index_name, ped_marker_tbl.index_name)
+    assert_array_equal(bed_marker_tbl.index_values,
+                       ped_marker_tbl.index_values)
+    assert_array_equal(bed_marker_tbl.columns, ped_marker_tbl.columns)
+
+    bedG = masked_invalid(asarray(bed_G))
+    pedG = masked_invalid(asarray(ped_G))
+
+    for i in range(bedG.shape[1]):
+        ok = all(bedG[:,i] == pedG[:,i])
+        if not ok:
+
+            idx0 = bedG[:,i] == 0
+            idx2 = bedG[:,i] == 2
+
+            bedG[idx0,i] = 2
+            bedG[idx2,i] = 0
+
+            ok = all(bedG[:,i] == pedG[:,i])
+
+        assert_array_equal(ok, True)
