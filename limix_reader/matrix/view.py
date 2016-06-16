@@ -10,8 +10,8 @@ class MatrixView(MatrixInterface):
         self._marker_set = set(list(marker_ids))
 
     def item(self, sample_id, marker_id):
-        if sample_id in self._sample_set and marker_id in self._sample_set:
-            return self._ref._item(sample_id, marker_id)
+        if sample_id in self._sample_set and marker_id in self._marker_set:
+            return self._ref.item(sample_id, marker_id)
         raise IndexError
 
 

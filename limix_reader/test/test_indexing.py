@@ -26,19 +26,8 @@ def test_read():
     G3 = limr.reader.csv(join(root, 'genotype_bigger2.csv'), genotype=True,
                          na_values='?')
 
-    # sample_ids1 = table1["column_name_0"] > 0
-    # sample_ids2 = table2["column_name_0"] != table1["column_name_2"]
-
-    print("-----------------------")
-
-    # print(G1.sample_ids, G1.marker_ids)
-    # print(G2.sample_ids, G2.marker_ids)
-    # print(sample_ids1)
-
     G12 = G1.merge(G2)
     G123 = G12.merge(G3)
-    # print(G12.sample_ids)
-    # print(G12.marker_ids)
 
     assert_equal(G123.item(0, 0), 0)
     assert_equal(G123.item(0, 1), 1)
@@ -49,3 +38,10 @@ def test_read():
 
     with assert_raises(ValueError):
         G123.item(2, 3)
+
+    G = G123[[0, 1], [0, 2, 3, 4, 5]]
+    assert_equal(G.item(0, 0), 0)
+
+    assert_equal(G.item(1, 5), 1)
+    with assert_raises(IndexError):
+        G.item(0, 1)

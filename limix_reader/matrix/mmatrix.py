@@ -4,6 +4,9 @@ from numpy import union1d
 from numpy import isnan
 from numpy import nan
 
+from .view import MatrixView
+from ..util import make_sure_list
+
 class MMatrix(MatrixInterface):
     def __init__(self, lhs, rhs):
         super(MMatrix, self).__init__()
@@ -68,7 +71,9 @@ class MMatrix(MatrixInterface):
         return v0
 
     def __getitem__(self, args):
-        raise NotImplementedError
+        sample_ids = make_sure_list(args[0])
+        marker_ids = make_sure_list(args[1])
+        return MatrixView(self, sample_ids, marker_ids)
 
     @property
     def shape(self):
