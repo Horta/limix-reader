@@ -27,8 +27,11 @@ class NPyMatrix(MatrixInterface):
         self._sample_map = bidict(zip(self._sample_ids, arange(n, dtype=int)))
         self._marker_map = bidict(zip(self._marker_ids, arange(p, dtype=int)))
 
-    def item(self, *args):
-        return self._arr.item(*args)
+    def item(self, sample_id, marker_id):
+        if sample_id in self._sample_map and marker_id in self._marker_map:
+            return self._arr.item(self._sample_map[sample_id],
+                                  self._marker_map[marker_id])
+        raise IndexError
 
     def __getitem__(self, args):
         sample_ids = make_sure_list(args[0])

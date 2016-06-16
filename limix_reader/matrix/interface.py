@@ -36,3 +36,7 @@ class MatrixInterface(object):
     @property
     def marker_ids(self):
         raise NotImplementedError
+
+    def merge(self, that):
+        from .mmatrix import MMatrix
+        return MMatrix(self, that)
