@@ -5,6 +5,7 @@ from numpy import asarray
 from numpy import vectorize
 from numpy import atleast_1d
 from numpy import intersect1d
+from numpy.ma import masked_invalid
 
 from ..util import npy2py_cast
 from ..util import npy2py_type
@@ -65,8 +66,8 @@ class Vector(object):
             labels_rhs = that._labels
             labels = intersect1d(labels_lhs, labels_rhs)
 
-            vals_lhs = _npy_map(labels, self._map)
-            vals_rhs = _npy_map(labels, that._map)
+            vals_lhs = masked_invalid(_npy_map(labels, self._map))
+            vals_rhs = masked_invalid(_npy_map(labels, that._map))
 
             return self._labels[getattr(vals_lhs, opname)(vals_rhs)]
 

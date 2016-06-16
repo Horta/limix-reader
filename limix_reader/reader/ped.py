@@ -5,7 +5,7 @@ from numpy import empty
 
 from pandas import read_csv
 
-from .plink import read_map
+from .plink import read_bim
 from ..table import Table
 from ..matrix import NPyMatrix
 
@@ -24,15 +24,10 @@ def _read_ped_genotype(M):
         if len(a) == 0 or len(a) > 2:
             raise ValueError
 
-        if len(a) == 1:
-            minor_allele = a[0]
-        else:
-            a0 = sum(v == a[0])
-            a1 = sum(v == a[1])
-            minor_allele = a[0] if a0 <= a1 else a[1]
+        allele = a[1]
 
-        G[:,i]  = left == minor_allele
-        G[:,i] += right == minor_allele
+        G[:,i]  = left == allele
+        G[:,i] += right == allele
         G[left == '0',i] = nan
 
     return G
@@ -61,9 +56,9 @@ def _read_ped(filepath):
 
 def reader(basepath):
     (sample_tbl, G) = _read_ped(basepath + '.ped')
-    marker_tbl = read_map(basepath + '.map')
+    marker_tbl = read_bim(basepath + '.bim')
 
-    NPyMatrix(G, sample_id=sample_tbl.index_values,
-                 marker_id=marker_tbl.index_values)
+    NPyMatrix(G, sample_ids=sample_tbl.index_values,
+                 marker_ids=marker_tbl.index_values)
 
     return (sample_tbl, marker_tbl, G)

@@ -1,4 +1,3 @@
-
 def define_binary_operators(cls, method_name):
     _opnames = ['__eq__', '__ne__', '__ge__', '__gt__',  '__le__', '__lt__']
     for opn in _opnames:
