@@ -12,28 +12,28 @@ class MMatrix(MatrixInterface):
         super(MMatrix, self).__init__()
         self._lhs = lhs
         self._rhs = rhs
-        self._sample_map = dict()
-        self._marker_map = dict()
-
-        for sid in lhs.sample_ids:
-            if sid not in self._sample_map:
-                self._sample_map[sid] = []
-            self._sample_map[sid].append(0)
-
-        for mid in lhs.marker_ids:
-            if mid not in self._marker_map:
-                self._marker_map[mid] = []
-            self._marker_map[mid].append(0)
-
-        for sid in rhs.sample_ids:
-            if sid not in self._sample_map:
-                self._sample_map[sid] = []
-            self._sample_map[sid].append(0)
-
-        for mid in rhs.marker_ids:
-            if mid not in self._marker_map:
-                self._marker_map[mid] = []
-            self._marker_map[mid].append(0)
+        # self._sample_map = dict()
+        # self._marker_map = dict()
+        #
+        # for sid in lhs.sample_ids:
+        #     if sid not in self._sample_map:
+        #         self._sample_map[sid] = []
+        #     self._sample_map[sid].append(0)
+        #
+        # for mid in lhs.marker_ids:
+        #     if mid not in self._marker_map:
+        #         self._marker_map[mid] = []
+        #     self._marker_map[mid].append(0)
+        #
+        # for sid in rhs.sample_ids:
+        #     if sid not in self._sample_map:
+        #         self._sample_map[sid] = []
+        #     self._sample_map[sid].append(0)
+        #
+        # for mid in rhs.marker_ids:
+        #     if mid not in self._marker_map:
+        #         self._marker_map[mid] = []
+        #     self._marker_map[mid].append(0)
 
     def item(self, sample_id, marker_id):
         try:

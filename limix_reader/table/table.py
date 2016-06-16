@@ -5,9 +5,11 @@ from pandas import DataFrame
 from .column import Column
 from ..util import npy2py_type
 from ..util import make_sure_list
+from .interface import TableInterface
 
-class Table(object):
+class Table(TableInterface):
     def __init__(self, df=None):
+        super(Table, self).__init__()
         self._df = DataFrame() if df is None else df
 
     def add(self, c):
@@ -70,10 +72,11 @@ class Table(object):
     def dtypes(self):
         return self._df.dtypes
 
-    def __array__(self, index_values=None):
-        if index_values is None:
+    def __array__(self, *args, **kwargs):
+        kwargs = dict(kwargs)
+        if 'index_values' not in kwargs:
             return self._df.__array__()
-        return self._df.loc[index_values].__array__()
+        return self._df.loc[kwargs['index_values']].__array__()
 
     def __repr__(self):
         return repr(self._df)
@@ -125,10 +128,11 @@ class TableView(object):
     def dtypes(self):
         return self._df.dtypes
 
-    def __array__(self, index_values=None):
-        if index_values is None:
-            index_values = self._index_values
-        return self._ref.__array__(index_values=self._index_values)
+    def __array__(self, *args, **kwargs):
+        kwargs = dict(kwargs)
+        if 'index_values' not in kwargs:
+            kwargs['index_values'] = self._index_values
+        return self._ref.__array__(*args, **kwargs)
 
     def __repr__(self):
         return repr(self.__array__())
