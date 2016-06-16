@@ -6,15 +6,14 @@ from numpy import arange
 from numpy import empty
 
 from .plink import read_bed_item
-# from .plink.bed import entirely as bed_entirely
 from .plink import read_bed_intidx
 
 from .plink import read_map
 
 from ..matrix import MatrixInterface
-from ..matrix import normalize_getitem_args
 from ..matrix import MatrixView
 from ..table import Table
+from ..util import make_sure_list
 
 def _read_fam(filepath):
     column_names = ['family_id', 'individual_id', 'paternal_id', 'maternal_id',
@@ -34,9 +33,9 @@ def _read_fam(filepath):
 
     return table
 
-class BedPath(MatrixInterface):
+class BEDMatrix(MatrixInterface):
     def __init__(self, filepath, sample_ids, marker_ids):
-        super(BedPath, self).__init__()
+        super(BEDMatrix, self).__init__()
         self._filepath = filepath
         self._sample_ids = sample_ids
         self._marker_ids = marker_ids
@@ -53,7 +52,8 @@ class BedPath(MatrixInterface):
         return read_bed_item(self._filepath, r, c, self.shape)
 
     def __getitem__(self, args):
-        sample_ids, marker_ids = normalize_getitem_args(args)
+        sample_ids = make_sure_list(args[0])
+        marker_ids = make_sure_list(args[1])
         return MatrixView(self, sample_ids, marker_ids)
 
     @property
@@ -96,6 +96,6 @@ class BedPath(MatrixInterface):
 def reader(basepath):
     sample_tbl = _read_fam(basepath + '.fam')
     marker_tbl = read_map(basepath + '.map')
-    G = BedPath(basepath + '.bed', sample_tbl.index_values,
+    G = BEDMatrix(basepath + '.bed', sample_tbl.index_values,
                 marker_tbl.index_values)
     return (sample_tbl, marker_tbl, G)

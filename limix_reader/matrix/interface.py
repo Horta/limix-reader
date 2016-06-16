@@ -5,7 +5,7 @@ class MatrixInterface(object):
     def item(self, sample_id, marker_id):
         raise NotImplementedError
 
-    def __getitem__(self, sample_ids, marker_ids):
+    def __getitem__(self, args):
         raise NotImplementedError
 
     @property
