@@ -1,4 +1,6 @@
-bola1,bola2,bola3
-cabeca1,cabeca2,cabeca3
-pirulito1,pirulito2,pirulito3
-bum1,bum2,bum3
+marker_ids,temperature,pressure,color
+geneA,10,1.23,red
+geneB,5,3.2,blue
+geneC,-3,0.1,blue
+geneD,-13,0.2,blue
+geneE,33,0.1,red

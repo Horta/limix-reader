@@ -1,0 +1,7 @@
+marker_ids,temperature,status,pressure,color
+geneA,10,paused,1.23,red
+geneC,-3,paused,0.1,blue
+geneD,-13,running,0.2,blue
+geneE,33,paused,0.1,blue
+geneF,3,running,-23.,red
+geneG,-3,running,8.325,red
