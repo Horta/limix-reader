@@ -1,15 +1,10 @@
-from numpy import object_
 from numpy import nan
 from numpy import array
 from numpy import asarray
-from numpy import logical_not as lnot
 
 from numpy.testing import assert_array_equal
 from numpy.testing import assert_equal
 from numpy.testing import assert_raises
-from numpy.ma import masked_invalid
-
-from pandas import isnull
 
 from ..table import Table
 from ..column import Column
