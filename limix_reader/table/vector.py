@@ -1,76 +1,90 @@
-from collections import MutableMapping
-from collections import OrderedDict as odict
-
 from numpy import asarray
-from numpy import vectorize
-from numpy import atleast_1d
 from numpy import intersect1d
+from numpy import union1d
 from numpy.ma import masked_invalid
 
-from ..util import npy2py_cast
-from ..util import npy2py_type
 from ..util import define_binary_operators
+from ..util import isscalar
+from ..util import ndict
+from ..util import list_transpose
 
-def __npy_map(v, d):
-    return d[v]
-
-_npy_map = vectorize(__npy_map)
+from tabulate import tabulate
 
 class Vector(object):
-    def __init__(self, labels, values):
-        labels = asarray(labels).astype(npy2py_type(type(labels[0])))
-        self._labels = labels
-
-        values = asarray(values).astype(npy2py_type(type(values[0])))
-        self._values = values
+    def __init__(self, indices, values):
+        self._indices = asarray(indices)
+        self._values = asarray(values)
 
         n = len(values)
-        self._map = odict([(labels[i], values[i]) for i in range(n)])
+        self._map = ndict([(indices[i], values[i]) for i in range(n)])
 
     def merge(self, that):
-        from .mvector import MVector
-        return MVector(self, that)
+        uidx = union1d(self._indices, that._indices)
+        iidx = intersect1d(self._indices, that._indices)
+
+        vals_lhs = self._map[iidx]
+        vals_rhs = that._map[iidx]
+        if any(vals_lhs != vals_rhs):
+            raise ValueError("Values differ between the merging vectors.")
+
+        def onehas(key, l, r):
+            return l[key] if key in l else r[key]
+
+        return Vector(uidx, [onehas(i, self, that) for i in uidx])
 
     @property
     def index_values(self):
-        return self._labels
+        return self._indices
 
     def __len__(self):
         return len(self._values)
 
-    def __getitem__(self, args):
-        if npy2py_type(type(args)) in [int, bytes, float]:
-            return npy2py_cast(self._map[args])
-        idx = atleast_1d(args)
-        return asarray([self._map[i] for i in idx])
+    def __contains__(self, idx):
+        return idx in self._map
+
+    def __getitem__(self, idx):
+        if isscalar(idx):
+            return self._map[idx]
+        return Vector(idx, [self._map[i] for i in idx])
 
     def items(self):
-        return VectorView(self, self._map)
+        return VectorItems(self)
 
     def __repr__(self):
-        return repr(self.__array__())
+        return self.__str__()
 
     def __str__(self):
-        return bytes(self.__array__())
+        l = [list(self._indices), list(self._values)]
+        return tabulate(list_transpose(l), tablefmt="plain")
 
     def __array__(self):
         return self._values
 
     @property
     def dtype(self):
-        return npy2py_type(self._values.dtype)
+        return self._values.dtype
 
     def __compare__(self, that, opname):
         if isinstance(that, Vector):
-            labels_lhs = self._labels
-            labels_rhs = that._labels
-            labels = intersect1d(labels_lhs, labels_rhs)
+            idx_lhs = self._indices
+            idx_rhs = that._indices
+            indices = intersect1d(idx_lhs, idx_rhs)
 
-            vals_lhs = masked_invalid(_npy_map(labels, self._map))
-            vals_rhs = masked_invalid(_npy_map(labels, that._map))
+            vals_lhs = masked_invalid(self._map[indices])
+            vals_rhs = masked_invalid(that._map[indices])
 
-            return self._labels[getattr(vals_lhs, opname)(vals_rhs)]
+            return indices[getattr(vals_lhs, opname)(vals_rhs)]
 
-        return self._labels[getattr(self._values, opname)(that)]
+        return self._indices[getattr(self._values, opname)(that)]
 
 define_binary_operators(Vector, '__compare__')
+
+class VectorItems(object):
+    def __init__(self, ref):
+        self._ref = ref
+
+    def __len__(self):
+        return len(self._ref)
+
+    def __iter__(self):
+        return len(self._ref)
