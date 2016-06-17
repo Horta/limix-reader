@@ -46,3 +46,24 @@ def test_npymatrix():
 
     with assert_raises(ValueError):
         G23.item("sample4", "marker3")
+
+    g = G23[["sample1", "sample3"], ["marker2", "marker8"]]
+    assert_equal(g.item("sample1", "marker2"), 1)
+    assert_equal(g.item("sample1", "marker8"), 0)
+    assert_equal(isnan(g.item("sample3", "marker2")), True)
+    assert_equal(g.item("sample3", "marker8"), 0)
+
+def test_missing_completion():
+    root = dirname(realpath(__file__))
+    root = join(root, 'data')
+
+    G1 = read_csv(join(root, 'genotype_2x2_lhs.csv'), header=0, index_col=0,
+                  na_values='?')
+    G2 = read_csv(join(root, 'genotype_2x2_rhs.csv'), header=0, index_col=0,
+                  na_values='?')
+
+    G1 = NPyMatrix(G1)
+    G2 = NPyMatrix(G2)
+
+    G12 = G1.merge(G2)
+    assert_equal(G12, asarray([[2, 2], [2, 2]]))

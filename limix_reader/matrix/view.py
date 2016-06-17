@@ -1,6 +1,9 @@
 from .interface import MatrixInterface
 
 from numpy import asarray
+from numpy import arange
+
+from ..util import ndict
 
 class MatrixView(MatrixInterface):
     def __init__(self, ref, sample_ids, marker_ids):
@@ -8,12 +11,15 @@ class MatrixView(MatrixInterface):
         self._ref = ref
         self._sample_ids = asarray(sample_ids)
         self._marker_ids = asarray(marker_ids)
-        
-        self._sample_set = set(list(self._sample_ids))
-        self._marker_set = set(list(self._marker_ids))
+
+        n = len(self._sample_ids)
+        p = len(self._marker_ids)
+
+        self._sample_map = ndict(zip(self._sample_ids, arange(n, dtype=int)))
+        self._marker_map = ndict(zip(self._marker_ids, arange(p, dtype=int)))
 
     def item(self, sample_id, marker_id):
-        if sample_id in self._sample_set and marker_id in self._marker_set:
+        if sample_id in self._sample_map and marker_id in self._marker_map:
             return self._ref.item(sample_id, marker_id)
         raise IndexError
 
@@ -47,6 +53,9 @@ class MatrixView(MatrixInterface):
         if 'sample_ids' not in kwargs:
             kwargs['sample_ids'] = self._sample_ids
             kwargs['marker_ids'] = self._marker_ids
+
+            kwargs['sample_map'] = self._sample_map
+            kwargs['marker_map'] = self._marker_map
 
         return self._ref.__array__(*args, **kwargs)
 

@@ -4,9 +4,10 @@ from numpy import asarray
 
 from .interface import MatrixInterface
 from .view import MatrixView
+from .mmatrix import MMatrix
 from ..util import isscalar
 from ..util import ndict
-from .mmatrix import MMatrix
+from ..util import copyto_nans
 
 def _get_ids(ids, size):
     if ids is None:
@@ -91,3 +92,8 @@ class NPyMatrix(MatrixInterface):
 
     def merge(self, that):
         return MMatrix(self, that)
+
+    def _copy_to(self, sample_ids, marker_ids, to_sidx, to_midx, G):
+        from_sidx = self._sample_map[sample_ids]
+        from_midx = self._marker_map[marker_ids]
+        copyto_nans(from_sidx, from_midx, self._arr, to_sidx, to_midx, G)

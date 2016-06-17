@@ -1,11 +1,14 @@
-from .view import MatrixInterface
-
+from numpy import intersect1d
 from numpy import union1d
+from numpy import arange
 from numpy import isnan
+from numpy import full
 from numpy import nan
 
+from .interface import MatrixInterface
 from .view import MatrixView
-from ..util import make_sure_list
+from .util import normalize_getitem_args
+from ..util import ndict
 
 class MMatrix(MatrixInterface):
     def __init__(self, lhs, rhs):
@@ -13,35 +16,18 @@ class MMatrix(MatrixInterface):
         self._lhs = lhs
         self._rhs = rhs
 
-        self._sample_set = set(list(union1d(lhs.sample_ids, rhs.sample_ids)))
-        self._marker_set = set(list(union1d(lhs.marker_ids, rhs.marker_ids)))
+        self._sample_ids = union1d(lhs.sample_ids, rhs.sample_ids)
+        self._marker_ids = union1d(lhs.marker_ids, rhs.marker_ids)
 
-        # self._sample_map = dict()
-        # self._marker_map = dict()
-        #
-        # for sid in lhs.sample_ids:
-        #     if sid not in self._sample_map:
-        #         self._sample_map[sid] = []
-        #     self._sample_map[sid].append(0)
-        #
-        # for mid in lhs.marker_ids:
-        #     if mid not in self._marker_map:
-        #         self._marker_map[mid] = []
-        #     self._marker_map[mid].append(0)
-        #
-        # for sid in rhs.sample_ids:
-        #     if sid not in self._sample_map:
-        #         self._sample_map[sid] = []
-        #     self._sample_map[sid].append(0)
-        #
-        # for mid in rhs.marker_ids:
-        #     if mid not in self._marker_map:
-        #         self._marker_map[mid] = []
-        #     self._marker_map[mid].append(0)
+        n = len(self._sample_ids)
+        p = len(self._marker_ids)
+
+        self._sample_map = ndict(zip(self._sample_ids, arange(n, dtype=int)))
+        self._marker_map = ndict(zip(self._marker_ids, arange(p, dtype=int)))
 
     def item(self, sample_id, marker_id):
-        if (sample_id not in self._sample_set and
-                marker_id not in self._marker_set):
+        if (sample_id not in self._sample_map and
+                marker_id not in self._marker_map):
             raise IndexError
 
         try:
@@ -63,9 +49,8 @@ class MMatrix(MatrixInterface):
         return v0 if isnan(v1) else v1
 
     def __getitem__(self, args):
-        sample_ids = make_sure_list(args[0])
-        marker_ids = make_sure_list(args[1])
-        return MatrixView(self, sample_ids, marker_ids)
+        args = normalize_getitem_args(args, self._marker_ids)
+        return MatrixView(self, args[0], args[1])
 
     @property
     def shape(self):
@@ -85,9 +70,6 @@ class MMatrix(MatrixInterface):
     def __str__(self):
         return bytes(self.__array__())
 
-    def __array__(self, *args, **kwargs):
-        raise NotImplementedError
-
     @property
     def sample_ids(self):
         return self._sample_ids
@@ -95,3 +77,35 @@ class MMatrix(MatrixInterface):
     @property
     def marker_ids(self):
         return self._marker_ids
+
+    def __array__(self, *args, **kwargs):
+        kwargs = dict(kwargs)
+
+        if 'sample_ids' not in kwargs:
+            kwargs['sample_ids'] = self._sample_ids
+            kwargs['marker_ids'] = self._marker_ids
+            kwargs['sample_map'] = self._sample_map
+            kwargs['marker_map'] = self._marker_map
+
+        n = len(kwargs['sample_ids'])
+        p = len(kwargs['marker_ids'])
+
+        G = full((n, p), nan)
+
+        s = intersect1d(self._lhs.sample_ids, kwargs['sample_ids'])
+        m = intersect1d(self._lhs.marker_ids, kwargs['marker_ids'])
+
+        sidx = kwargs['sample_map'][s]
+        midx = kwargs['marker_map'][m]
+
+        self._lhs._copy_to(s, m, sidx, midx, G)
+
+        s = intersect1d(self._rhs.sample_ids, kwargs['sample_ids'])
+        m = intersect1d(self._rhs.marker_ids, kwargs['marker_ids'])
+
+        sidx = kwargs['sample_map'][s]
+        midx = kwargs['marker_map'][m]
+
+        self._rhs._copy_to(s, m, sidx, midx, G)
+
+        return G
