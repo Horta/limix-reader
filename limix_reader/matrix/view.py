@@ -1,19 +1,21 @@
 from .interface import MatrixInterface
 
+from numpy import asarray
+
 class MatrixView(MatrixInterface):
     def __init__(self, ref, sample_ids, marker_ids):
         super(MatrixView, self).__init__()
         self._ref = ref
-        self._sample_ids = sample_ids
-        self._marker_ids = marker_ids
-        self._sample_set = set(list(sample_ids))
-        self._marker_set = set(list(marker_ids))
+        self._sample_ids = asarray(sample_ids)
+        self._marker_ids = asarray(marker_ids)
+        
+        self._sample_set = set(list(self._sample_ids))
+        self._marker_set = set(list(self._marker_ids))
 
     def item(self, sample_id, marker_id):
         if sample_id in self._sample_set and marker_id in self._marker_set:
             return self._ref.item(sample_id, marker_id)
         raise IndexError
-
 
     def __getitem__(self, args):
         raise NotImplementedError

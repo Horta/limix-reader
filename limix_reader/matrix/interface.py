@@ -38,5 +38,4 @@ class MatrixInterface(object):
         raise NotImplementedError
 
     def merge(self, that):
-        from .mmatrix import MMatrix
-        return MMatrix(self, that)
+        raise NotImplementedError
