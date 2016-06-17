@@ -92,6 +92,8 @@ def test_merge_tables():
     c = Column('height', labels, values)
     t2.add(c)
 
+    t12 = t1.merge(t2)
+
     assert_equal(t12['height']['sample01'], 34.3)
     assert_equal(t12['height']['sample02'], 2.3)
     assert_equal(t12['height']['sample03'], 103.4)
