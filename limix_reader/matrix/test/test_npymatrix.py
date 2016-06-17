@@ -67,3 +67,23 @@ def test_missing_completion():
 
     G12 = G1.merge(G2)
     assert_equal(G12, asarray([[2, 2], [2, 2]]))
+
+def test_matrix_expansion():
+    root = dirname(realpath(__file__))
+    root = join(root, 'data')
+
+    G1 = read_csv(join(root, 'genotype_2x2_left.csv'), header=0, index_col=0,
+                  na_values='?')
+    G2 = read_csv(join(root, 'genotype_2x2_right.csv'), header=0, index_col=0,
+                  na_values='?')
+
+    G1 = NPyMatrix(G1, G1.index.values, G1.columns)
+    G2 = NPyMatrix(G2, G2.index.values, G2.columns)
+
+    G12 = G1.merge(G2)
+    g = G12[["sample1", "sample2", "sample3", "sample4"], ["marker2"]]
+
+    assert_equal(g.item("sample1", "marker2"), 0)
+    assert_equal(g.item("sample2", "marker2"), 1)
+    assert_equal(isnan(g.item("sample3", "marker2")), True)
+    assert_equal(isnan(g.item("sample4", "marker2")), True)
