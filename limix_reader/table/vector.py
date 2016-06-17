@@ -87,4 +87,5 @@ class VectorItems(object):
         return len(self._ref)
 
     def __iter__(self):
-        return len(self._ref)
+        for i in range(len(self._ref)):
+            yield (self._ref._indices[i], self._ref._values[i])
