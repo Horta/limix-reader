@@ -6,6 +6,7 @@ from .interface import MatrixInterface
 from .view import MatrixView
 from ..util import isscalar
 from ..util import ndict
+from .mmatrix import MMatrix
 
 def _get_ids(ids, size):
     if ids is None:
@@ -87,3 +88,6 @@ class NPyMatrix(MatrixInterface):
     @property
     def marker_ids(self):
         return self._marker_ids
+
+    def merge(self, that):
+        return MMatrix(self, that)

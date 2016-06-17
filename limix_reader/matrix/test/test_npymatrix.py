@@ -4,7 +4,10 @@ from os.path import realpath
 
 from numpy import atleast_2d
 from numpy import asarray
+from numpy import isnan
+from numpy.testing import assert_equal
 from numpy.testing import assert_array_equal
+from numpy.testing import assert_raises
 
 from pandas import read_csv
 
@@ -30,3 +33,16 @@ def test_npymatrix():
     assert_array_equal(G2[['sample4', 'sample1'], ['marker3', 'marker5']],
                        asarray([[1, 1], [1, 0]]))
     assert_array_equal(G2['sample4', ['marker3', 'marker5']], [[1, 1]])
+
+    G3 = read_csv(join(root, 'genotype_named2.csv'), header=0, index_col=0,
+                  na_values='?')
+    G3 = NPyMatrix(asarray(G3), G3.index.values, G3.columns)
+
+    G23 = G2.merge(G3)
+    assert_equal(G23.item("sample1", "marker1"), 0)
+    assert_equal(isnan(G23.item("sample6", "marker4")), True)
+    assert_equal(isnan(G23.item("sample5", "marker7")), True)
+    assert_equal(G23.item("sample5", "marker8"), 1)
+
+    with assert_raises(ValueError):
+        G23.item("sample4", "marker3")

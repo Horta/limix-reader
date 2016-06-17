@@ -12,6 +12,10 @@ class MMatrix(MatrixInterface):
         super(MMatrix, self).__init__()
         self._lhs = lhs
         self._rhs = rhs
+
+        self._sample_set = set(list(union1d(lhs.sample_ids, rhs.sample_ids)))
+        self._marker_set = set(list(union1d(lhs.marker_ids, rhs.marker_ids)))
+
         # self._sample_map = dict()
         # self._marker_map = dict()
         #
@@ -36,39 +40,27 @@ class MMatrix(MatrixInterface):
         #     self._marker_map[mid].append(0)
 
     def item(self, sample_id, marker_id):
+        if (sample_id not in self._sample_set and
+                marker_id not in self._marker_set):
+            raise IndexError
+
         try:
             v0 = self._lhs.item(sample_id, marker_id)
         except IndexError:
-            v0 = None
+            v0 = nan
 
         try:
             v1 = self._rhs.item(sample_id, marker_id)
         except IndexError:
-            v1 = None
+            v1 = nan
 
-        if v0 is None and v1 is None:
-            raise IndexError
+        if not isnan(v0) and not isnan(v1):
+            if v0 != v1:
+                msg = ("There are conflicting genotype values from" +
+                       " different sources.")
+                raise ValueError(msg)
 
-        if v0 is None:
-            return v1 if not isnan(v1) else nan
-        if v1 is None:
-            return v0 if not isnan(v0) else nan
-
-        if isnan(v0) and isnan(v1):
-            return nan
-
-        if isnan(v0):
-            return v1
-
-        if isnan(v1):
-            return v0
-
-        if v0 != v1:
-            msg = ("There are conflicting genotype values from" +
-                   " different sources.")
-            raise ValueError(msg)
-
-        return v0
+        return v0 if isnan(v1) else v1
 
     def __getitem__(self, args):
         sample_ids = make_sure_list(args[0])
@@ -98,8 +90,8 @@ class MMatrix(MatrixInterface):
 
     @property
     def sample_ids(self):
-        return union1d(self._lhs.sample_ids, self._rhs.sample_ids)
+        return self._sample_ids
 
     @property
     def marker_ids(self):
-        return union1d(self._lhs.marker_ids, self._rhs.marker_ids)
+        return self._marker_ids
