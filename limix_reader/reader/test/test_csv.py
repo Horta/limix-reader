@@ -4,12 +4,12 @@ from os.path import realpath
 
 from numpy import array
 from numpy import asarray
-from numpy import vstack
+# from numpy import vstack
 from numpy.testing import assert_array_equal
 
-def test_read():
-    from ..csv import reader
+from ..csv import reader
 
+def test_read():
     root = dirname(realpath(__file__))
     root = join(root, 'data')
 
@@ -53,3 +53,18 @@ def test_read():
     assert_array_equal(table["column_name_0"][sample_ids], [1])
 
     # assert_array_equal(table.loc([0, 3]), vstack([R[0,:], R[3,:]]))
+
+def test_alleles():
+    root = dirname(realpath(__file__))
+    root = join(root, 'data')
+
+    table = reader(join(root, '2d_array.csv'), genotype=True)
+
+    R = [[ 0.,  1.,  2.,  1.,  0.],
+         [ 0.,  1.,  2.,  1.,  0.],
+         [ 1.,  0.,  1.,  1.,  1.],
+         [ 2.,  2.,  0.,  1.,  0.]]
+
+    R = array(R)
+    print("")
+    print(table)

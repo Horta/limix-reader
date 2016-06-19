@@ -1,6 +1,9 @@
 from numpy import atleast_2d
 from numpy import arange
 from numpy import asarray
+from numpy import full
+
+from tabulate import tabulate
 
 from .interface import MatrixInterface
 from .view import MatrixView
@@ -18,8 +21,18 @@ def _get_ids(ids, size):
         else:
             return asarray(ids)
 
+def _get_alleles(alleles, size, default_char_name):
+    if alleles is None:
+        return full(size, default_char_name, dtype='|S1')
+    else:
+        if isscalar(alleles):
+            return asarray([alleles])
+        else:
+            return asarray(alleles)
+
 class NPyMatrix(MatrixInterface):
-    def __init__(self, arr, sample_ids=None, marker_ids=None):
+    def __init__(self, arr, sample_ids=None, marker_ids=None,
+                 allelesA=None, allelesB=None):
         super(NPyMatrix, self).__init__()
         self._arr = atleast_2d(arr)
 
@@ -31,6 +44,9 @@ class NPyMatrix(MatrixInterface):
 
         self._sample_map = ndict(zip(self._sample_ids, arange(n, dtype=int)))
         self._marker_map = ndict(zip(self._marker_ids, arange(p, dtype=int)))
+
+        self._allelesA = _get_alleles(allelesA, p, 'A')
+        self._allelesB = _get_alleles(allelesB, p, 'B')
 
     def item(self, sample_id, marker_id):
         if sample_id in self._sample_map and marker_id in self._marker_map:
@@ -64,12 +80,6 @@ class NPyMatrix(MatrixInterface):
     def dtype(self):
         return self._arr.dtype
 
-    def __repr__(self):
-        return self._arr.__repr__()
-
-    def __str__(self):
-        return self._arr.__str__()
-
     def __array__(self, *args, **kwargs):
         kwargs = dict(kwargs)
 
@@ -97,3 +107,11 @@ class NPyMatrix(MatrixInterface):
         from_sidx = self._sample_map[sample_ids]
         from_midx = self._marker_map[marker_ids]
         copyto_nans(from_sidx, from_midx, self._arr, to_sidx, to_midx, G)
+
+    @property
+    def allelesA(self):
+        return self._allelesA
+
+    @property
+    def allelesB(self):
+        return self._allelesB

@@ -1,3 +1,5 @@
+from tabulate import tabulate
+
 class MatrixInterface(object):
     def __init__(self):
         pass
@@ -21,16 +23,36 @@ class MatrixInterface(object):
         raise NotImplementedError
 
     def __repr__(self):
-        return repr(self.__array__())
+        return self.__repr__()
 
     def __str__(self):
-        return bytes(self.__array__())
+        p = self.shape[1]
+        header = ['', 'marker_id: alleleA/alleleB'] + [''] * (p-1)
+        alA = self.allelesA
+        alB = self.allelesB
+        mid = self.marker_ids
+        subhdr = ['sample_id']
+        subhdr += [bytes(mid[i])+': '+bytes(alA[i])+'/'+bytes(alB[i])
+                   for i in range(p)]
+        tbl = [header] + [subhdr]
+        sid = self.sample_ids
+        arr = self.__array__()
+        tbl += [[sid[i]] + r for (i, r) in enumerate(arr.tolist())]
+        return bytes(tabulate(tbl, tablefmt='plain'))
 
     def __array__(self, *args, **kwargs):
         raise NotImplementedError
 
     @property
     def sample_ids(self):
+        raise NotImplementedError
+
+    @property
+    def allelesA(self):
+        raise NotImplementedError
+
+    @property
+    def allelesB(self):
         raise NotImplementedError
 
     @property
