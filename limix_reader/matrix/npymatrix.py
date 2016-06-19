@@ -2,8 +2,7 @@ from numpy import atleast_2d
 from numpy import arange
 from numpy import asarray
 from numpy import full
-
-from tabulate import tabulate
+from numpy import isnan
 
 from .interface import MatrixInterface
 from .view import MatrixView
@@ -48,10 +47,24 @@ class NPyMatrix(MatrixInterface):
         self._allelesA = _get_alleles(allelesA, p, 'A')
         self._allelesB = _get_alleles(allelesB, p, 'B')
 
-    def item(self, sample_id, marker_id):
+        self._allelesA_map = ndict(zip(self._marker_ids, self._allelesA))
+        self._allelesB_map = ndict(zip(self._marker_ids, self._allelesB))
+
+    def item(self, sample_id, marker_id, alleleB=None):
+
+        if alleleB is None and marker_id in self._allelesB_map:
+            alleleB = self._allelesB_map[marker_id]
+
         if sample_id in self._sample_map and marker_id in self._marker_map:
-            return self._arr.item(self._sample_map[sample_id],
-                                  self._marker_map[marker_id])
+            v = self._arr.item(self._sample_map[sample_id],
+                               self._marker_map[marker_id])
+
+            if isnan(v):
+                return v
+
+            eq = int(alleleB == self._allelesB_map[marker_id])
+            return eq * v + (1-eq) * (2 - v)
+
         raise IndexError
 
     def __getitem__(self, args):

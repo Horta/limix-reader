@@ -4,7 +4,7 @@ class MatrixInterface(object):
     def __init__(self):
         pass
 
-    def item(self, sample_id, marker_id):
+    def item(self, sample_id, marker_id, alleleB=None):
         raise NotImplementedError
 
     def __getitem__(self, args):
