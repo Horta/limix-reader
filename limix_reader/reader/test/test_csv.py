@@ -6,6 +6,7 @@ from numpy import array
 from numpy import asarray
 # from numpy import vstack
 from numpy.testing import assert_array_equal
+from numpy.testing import assert_equal
 
 from ..csv import reader
 
@@ -58,13 +59,17 @@ def test_alleles():
     root = dirname(realpath(__file__))
     root = join(root, 'data')
 
-    table = reader(join(root, '2d_array.csv'), genotype=True)
+    tbl1 = reader(join(root, '2d_array.csv'), genotype=True)
 
-    R = [[ 0.,  1.,  2.,  1.,  0.],
-         [ 0.,  1.,  2.,  1.,  0.],
-         [ 1.,  0.,  1.,  1.,  1.],
-         [ 2.,  2.,  0.,  1.,  0.]]
+    tbl2 = reader(join(root, '2d_array_inv_alleles.csv'), genotype=True)
 
-    R = array(R)
-    print("")
-    print(table)
+    alA = tbl2.allelesA
+    alB = tbl2.allelesB
+
+    tbl2.allelesA = alB
+    tbl2.allelesB = alA
+
+    tabl12 = tbl1.merge(tbl2)
+    assert_equal(tabl12.item(0,0), 0)
+    assert_equal(tabl12.item(4,0), 1)
+    assert_equal(tabl12.item(4,4), 0)

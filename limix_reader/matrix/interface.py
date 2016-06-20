@@ -55,6 +55,14 @@ class MatrixInterface(object):
     def allelesB(self):
         raise NotImplementedError
 
+    @allelesA.setter
+    def allelesA(self, v):
+        raise NotImplementedError
+
+    @allelesB.setter
+    def allelesB(self, v):
+        raise NotImplementedError
+
     @property
     def marker_ids(self):
         raise NotImplementedError

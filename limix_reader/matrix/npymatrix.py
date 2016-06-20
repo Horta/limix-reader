@@ -47,6 +47,9 @@ class NPyMatrix(MatrixInterface):
         self._allelesA = _get_alleles(allelesA, p, 'A')
         self._allelesB = _get_alleles(allelesB, p, 'B')
 
+        self._update_alleles_map()
+
+    def _update_alleles_map(self):
         self._allelesA_map = ndict(zip(self._marker_ids, self._allelesA))
         self._allelesB_map = ndict(zip(self._marker_ids, self._allelesB))
 
@@ -128,3 +131,13 @@ class NPyMatrix(MatrixInterface):
     @property
     def allelesB(self):
         return self._allelesB
+
+    @allelesA.setter
+    def allelesA(self, v):
+        self._allelesA = v
+        self._update_alleles_map()
+
+    @allelesB.setter
+    def allelesB(self, v):
+        self._allelesB = v
+        self._update_alleles_map()
