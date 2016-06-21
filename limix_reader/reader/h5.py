@@ -6,16 +6,28 @@ from numpy import atleast_2d
 
 from ..table import Table
 from ..table import Column
-from ..util.type import npy2py_type
+# from ..util.type import npy2py_type
 
-def reader(filepath, itempath, dtype=None):
+from ..matrix import H5Matrix
+
+# def _reader_matrix(filepath, itempath):
+#     with h5.File(filepath, 'r') as f:
+#         arr = asarray(f[itempath])
+#         arr = atleast_2d(arr)
+
+def reader(filepath, itempath, genotype=False):
+
+    if genotype:
+        return H5Matrix(filepath, itempath)
+    # else:
+    #     return _reader_table(filepath, row_header, col_header, na_values)
 
     with h5.File(filepath, 'r') as f:
 
-        if dtype is None:
-            dtype = npy2py_type(f[itempath].dtype)
+        # if dtype is None:
+            # dtype = npy2py_type(f[itempath].dtype)
 
-        arr = asarray(f[itempath], dtype=dtype)
+        arr = asarray(f[itempath])
         arr = atleast_2d(arr)
 
     index = arange(arr.shape[0], dtype=int)

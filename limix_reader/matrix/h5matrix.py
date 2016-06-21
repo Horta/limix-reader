@@ -1,8 +1,8 @@
 from numpy import atleast_2d
 from numpy import arange
-from numpy import asarray
-from numpy import full
 from numpy import isnan
+
+import h5py as h5
 
 from .interface import MatrixInterface
 from .view import MatrixView
@@ -13,14 +13,15 @@ from ..util import copyto_nans
 from .util import get_ids
 from .util import get_alleles
 
-class NPyMatrix(MatrixInterface):
-    def __init__(self, arr, sample_ids=None, marker_ids=None,
+class H5Matrix(MatrixInterface):
+    def __init__(self, filepath, itempath, sample_ids=None, marker_ids=None,
                  allelesA=None, allelesB=None):
-        super(NPyMatrix, self).__init__()
-        self._arr = atleast_2d(arr)
+        super(H5Matrix, self).__init__()
+        self._filepath = filepath
+        self._itempath = itempath
 
-        self._sample_ids = get_ids(sample_ids, self._arr.shape[0])
-        self._marker_ids = get_ids(marker_ids, self._arr.shape[1])
+        self._sample_ids = get_ids(sample_ids, self.shape[0])
+        self._marker_ids = get_ids(marker_ids, self.shape[1])
 
         n = len(self._sample_ids)
         p = len(self._marker_ids)
@@ -43,8 +44,10 @@ class NPyMatrix(MatrixInterface):
             alleleB = self._allelesB_map[marker_id]
 
         if sample_id in self._sample_map and marker_id in self._marker_map:
-            v = self._arr.item(self._sample_map[sample_id],
-                               self._marker_map[marker_id])
+            with h5.File(self._filepath, 'r') as f:
+                arr = f[self._itempath]
+                v = arr.item(self._sample_map[sample_id],
+                             self._marker_map[marker_id])
 
             if isnan(v):
                 return v
@@ -74,11 +77,13 @@ class NPyMatrix(MatrixInterface):
 
     @property
     def shape(self):
-        return self._arr.shape
+        with h5.File(self._filepath, 'r') as f:
+            return f[self._itempath].shape
 
     @property
     def dtype(self):
-        return self._arr.dtype
+        with h5.File(self._filepath, 'r') as f:
+            return f[self._itempath].dtype
 
     def __array__(self, *args, **kwargs):
         kwargs = dict(kwargs)
@@ -90,7 +95,9 @@ class NPyMatrix(MatrixInterface):
         sample_idx = self._sample_map[kwargs['sample_ids']]
         marker_idx = self._marker_map[kwargs['marker_ids']]
 
-        return atleast_2d(self._arr[sample_idx,:][:,marker_idx])
+        with h5.File(self._filepath, 'r') as f:
+            arr = f[self._itempath]
+            return atleast_2d(arr[sample_idx,:][:,marker_idx])
 
     @property
     def sample_ids(self):
@@ -106,7 +113,9 @@ class NPyMatrix(MatrixInterface):
     def _copy_to(self, sample_ids, marker_ids, to_sidx, to_midx, G):
         from_sidx = self._sample_map[sample_ids]
         from_midx = self._marker_map[marker_ids]
-        copyto_nans(from_sidx, from_midx, self._arr, to_sidx, to_midx, G)
+        with h5.File(self._filepath, 'r') as f:
+            arr = f[self._itempath]
+            copyto_nans(from_sidx, from_midx, arr, to_sidx, to_midx, G)
 
     @property
     def allelesA(self):
