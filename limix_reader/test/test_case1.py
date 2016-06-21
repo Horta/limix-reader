@@ -20,8 +20,8 @@ def test_case1():
     G_hdf5_2 = limr.reader.h5(join(root, 'hdf5-2.h5'), '/G', genotype=True)
 
     # import ipdb; ipdb.set_trace()
-    print(G_hdf5_1)
-    print(G_hdf5_2)
+    # print(G_hdf5_1)
+    # print(G_hdf5_2)
     # G_hdf5_1.col_header =
 
-test_case1()
+# test_case1()
