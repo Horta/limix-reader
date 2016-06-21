@@ -35,26 +35,18 @@ def _read_fam(filepath):
 
 class BEDMatrix(MatrixInterface):
     def __init__(self, filepath, sample_ids, marker_ids):
-        super(BEDMatrix, self).__init__()
+        shape = (len(sample_ids), len(marker_ids))
+        allelesA = None
+        allelesB = None
+        super(BEDMatrix, self).__init__(sample_ids, marker_ids,
+                                        allelesA, allelesB, shape)
+
         self._filepath = filepath
-        self._sample_ids = sample_ids
-        self._marker_ids = marker_ids
 
-        n = len(self._sample_ids)
-        p = len(self._marker_ids)
-
-        self._sample_map = bidict(zip(self._sample_ids, arange(n, dtype=int)))
-        self._marker_map = bidict(zip(self._marker_ids, arange(p, dtype=int)))
-
-    def item(self, sample_id, marker_id):
+    def _item(self, sample_id, marker_id):
         r = self._sample_map[sample_id]
         c = self._marker_map[marker_id]
         return read_bed_item(self._filepath, r, c, self.shape)
-
-    def __getitem__(self, args):
-        sample_ids = make_sure_list(args[0])
-        marker_ids = make_sure_list(args[1])
-        return MatrixView(self, sample_ids, marker_ids)
 
     @property
     def shape(self):
@@ -63,12 +55,6 @@ class BEDMatrix(MatrixInterface):
     @property
     def dtype(self):
         return int
-
-    def __repr__(self):
-        return repr(self.__array__())
-
-    def __str__(self):
-        return bytes(self.__array__())
 
     def __array__(self, *args, **kwargs):
         kwargs = dict(kwargs)
