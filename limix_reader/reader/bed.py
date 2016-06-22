@@ -1,8 +1,5 @@
 from pandas import read_csv
 
-from bidict import bidict
-
-from numpy import arange
 from numpy import empty
 
 from .plink import read_bed_item
@@ -11,9 +8,7 @@ from .plink import read_bed_intidx
 from .plink import read_map
 
 from ..matrix import MatrixInterface
-from ..matrix import MatrixView
 from ..table import Table
-from ..util import make_sure_list
 
 def _read_fam(filepath):
     column_names = ['family_id', 'individual_id', 'paternal_id', 'maternal_id',
@@ -49,35 +44,18 @@ class BEDMatrix(MatrixInterface):
         return read_bed_item(self._filepath, r, c, self.shape)
 
     @property
-    def shape(self):
-        return (len(self._sample_ids), len(self._marker_ids))
-
-    @property
     def dtype(self):
         return int
 
-    def __array__(self, *args, **kwargs):
-        kwargs = dict(kwargs)
+    def _array(self, sample_ids, marker_ids):
 
-        if 'sample_ids' not in kwargs:
-            kwargs['sample_ids'] = self._sample_ids
-            kwargs['marker_ids'] = self._marker_ids
-
-        sample_idx = [self._sample_map[si] for si in kwargs['sample_ids']]
-        marker_idx = [self._marker_map[mi] for mi in kwargs['marker_ids']]
+        sample_idx = self._sample_map[sample_ids]
+        marker_idx = self._marker_map[marker_ids]
 
         G = empty((len(sample_idx), len(marker_idx)))
         read_bed_intidx(self._filepath, sample_idx, marker_idx, self.shape, G)
 
         return G
-
-    @property
-    def sample_ids(self):
-        return self._sample_ids
-
-    @property
-    def marker_ids(self):
-        return self._marker_ids
 
 def reader(basepath):
     sample_tbl = _read_fam(basepath + '.fam')

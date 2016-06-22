@@ -26,11 +26,11 @@ ffi.set_source('limix_reader.reader.plink.cbed.bed_ffi',"""
     libraries=[])
 
 ffi.cdef("""
-int bed_item(char* filepath, int nsamples, int nmarkers, int sample, int marker);
+long bed_item(char* filepath, long nsamples, long nmarkers, long sample, long marker);
 
-void bed_intidx(char* filepath, int nsamples, int nmarkers,
-                int sn, long* samples, int mn, long* markers, double* matrix,
-                int* strides);
+void bed_intidx(char* filepath, long nsamples, long nmarkers,
+                long sn, long* samples, long mn, long* markers, double* matrix,
+                long* strides);
 """)
 
 

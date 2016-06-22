@@ -1,10 +1,10 @@
 #include "interface.h"
 #include "impl.h"
 
-int bed_item(char* filepath, int nsamples, int nmarkers, int sample, int marker)
+long bed_item(char* filepath, long nsamples, long nmarkers, long sample, long marker)
 {
     FILE* fp = fopen(filepath, "rb");
-    int shape[2];
+    long shape[2];
     ItemIdx idx;
 
     if (_snp_major(fp))
@@ -20,20 +20,20 @@ int bed_item(char* filepath, int nsamples, int nmarkers, int sample, int marker)
         idx.r = sample;
     }
 
-    int item = read_item(fp, shape, &idx);
+    long item = read_item(fp, shape, &idx);
     fclose(fp);
 
     return item;
 }
 
-void bed_intidx(char* filepath, int nsamples, int nmarkers,
-                int sn, long* samples, int mn, long* markers, double* matrix,
-                int* strides)
+void bed_intidx(char* filepath, long nsamples, long nmarkers,
+                long sn, long* samples, long mn, long* markers, double* matrix,
+                long* strides)
 {
     FILE* fp = fopen(filepath, "rb");
-    int shape[2];
+    long shape[2];
 
-    int smajor = _snp_major(fp);
+    long smajor = _snp_major(fp);
     if (smajor)
     {
         shape[0] = nmarkers;

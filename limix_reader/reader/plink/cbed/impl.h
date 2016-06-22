@@ -5,27 +5,27 @@
 
 typedef struct
 {
-    int r;
-    int c;
+    long r;
+    long c;
 } ItemIdx;
 
 typedef struct
 {
-    int s;
+    long s;
 } ByteIdx;
 
 typedef struct
 {
-    int s;
+    long s;
 } BitIdx;
 
-inline void _convert_idx_itby(int* shape, ItemIdx* idx, ByteIdx* bydx)
+inline void _convert_idx_itby(long* shape, ItemIdx* idx, ByteIdx* bydx)
 {
-    const int offset = 3;
+    const long offset = 3;
     bydx->s = offset + ((shape[1] + 3)/ 4) * idx->r + idx->c / 4;
 }
 
-inline void _convert_idx_itbi(int* shape, ItemIdx* idx, BitIdx* bidx)
+inline void _convert_idx_itbi(long* shape, ItemIdx* idx, BitIdx* bidx)
 {
     bidx->s = (idx->c % 4) * 2;
 }
@@ -41,7 +41,7 @@ inline char _get_snp(char v, BitIdx* bidx)
     return b ^ (b >> 1);
 }
 
-inline char read_item(FILE* fp, int* shape, ItemIdx* idx)
+inline char read_item(FILE* fp, long* shape, ItemIdx* idx)
 {
     ByteIdx bydx;
     _convert_idx_itby(shape, idx, &bydx);
@@ -54,11 +54,11 @@ inline char read_item(FILE* fp, int* shape, ItemIdx* idx)
     return _get_snp(fgetc(fp), &bidx);
 }
 
-void read_intidx(FILE* fp, int* shape,
-                 int rn, long* rows, int cn, long* cols,
-                 double* matrix, int* strides, int same_axis);
+void read_intidx(FILE* fp, long* shape,
+                 long rn, long* rows, long cn, long* cols,
+                 double* matrix, long* strides, long same_axis);
 
-inline int _snp_major(FILE* fp)
+inline long _snp_major(FILE* fp)
 {
     fseek(fp, 2, SEEK_SET);
     return fgetc(fp);

@@ -13,14 +13,8 @@ def reader(filepath, itempath, genotype=False):
 
     if genotype:
         return H5Matrix(filepath, itempath)
-    # else:
-    #     return _reader_table(filepath, row_header, col_header, na_values)
 
     with h5.File(filepath, 'r') as f:
-
-        # if dtype is None:
-            # dtype = npy2py_type(f[itempath].dtype)
-
         arr = asarray(f[itempath])
         arr = atleast_2d(arr)
 
