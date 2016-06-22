@@ -45,21 +45,6 @@ class MMatrix(MatrixInterface):
         self._lhs = lhs
         self._rhs = rhs
 
-        # imids = intersect1d(lhs.marker_ids, rhs.marker_ids)
-        # self._imarker_ids = imids
-        #
-        # mapA = lhs.allelesA[lhs._marker_map[imids]]
-        # mapB = lhs.allelesB[lhs._marker_map[imids]]
-        #
-        # self._iallelesA_map = ndict(zip(imids, mapA))
-        # self._iallelesB_map = ndict(zip(imids, mapB))
-        #
-        # n = len(self._sample_ids)
-        # p = len(self._marker_ids)
-        #
-        # self._sample_map = ndict(zip(self._sample_ids, arange(n, dtype=int)))
-        # self._marker_map = ndict(zip(self._marker_ids, arange(p, dtype=int)))
-
     def _item(self, sample_id, marker_id):
         alleleB = self.alleleB(marker_id)
 
