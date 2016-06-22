@@ -100,13 +100,10 @@ class MMatrix(MatrixInterface):
         midx = self._marker_map[marker_ids]
         ref._copy_to(sample_ids, marker_ids, sidx, midx, G)
 
-    def _array(self, sample_idx, marker_idx):
-        n = len(sample_idx)
-        p = len(marker_idx)
+    def _array(self, sample_ids, marker_ids):
+        n = len(sample_ids)
+        p = len(marker_ids)
         G = full((n, p), nan)
-
-        sample_ids = self.sample_ids[sample_idx]
-        marker_ids = self.marker_ids[marker_idx]
 
         self._copy_from_ref(sample_ids, marker_ids, self._lhs, G)
         self._copy_from_ref(sample_ids, marker_ids, self._rhs, G)

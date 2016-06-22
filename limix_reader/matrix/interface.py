@@ -95,17 +95,11 @@ class MatrixInterface(object):
         tbl += [[sid[i]] + r for (i, r) in enumerate(arr.tolist())]
         return bytes(tabulate(tbl, tablefmt='plain'))
 
-    def __array__(self, *_, **kwargs):
-        kwargs = dict(kwargs)
+    def __array__(self, *args, **kwargs):
+        return self._array(self.sample_ids, self.marker_ids)
 
-        if 'sample_ids' not in kwargs:
-            kwargs['sample_ids'] = self._sample_map.keys()
-            kwargs['marker_ids'] = self._marker_map.keys()
-
-        sample_idx = self._sample_map[kwargs['sample_ids']]
-        marker_idx = self._marker_map[kwargs['marker_ids']]
-
-        return self._array(sample_idx, marker_idx)
+    def _array(self, sample_ids, marker_ids):
+        raise NotImplementedError
 
     def _copy_to(self, sample_ids, marker_ids, to_sidx, to_midx, G):
         from_sidx = self._sample_map[sample_ids]

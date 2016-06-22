@@ -30,7 +30,9 @@ class H5Matrix(MatrixInterface):
         with h5.File(self._filepath, 'r') as f:
             return f[self._itempath].dtype
 
-    def _array(self, sample_idx, marker_idx):
+    def _array(self, sample_ids, marker_ids):
+        sample_idx = self._sample_map[sample_ids]
+        marker_idx = self._marker_map[marker_ids]
         with h5.File(self._filepath, 'r') as f:
             arr = f[self._itempath]
             return atleast_2d(arr[sample_idx,:][:,marker_idx])

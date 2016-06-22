@@ -22,5 +22,7 @@ class NPyMatrix(MatrixInterface):
     def dtype(self):
         return self._arr.dtype
 
-    def _array(self, sample_idx, marker_idx):
+    def _array(self, sample_ids, marker_ids):
+        sample_idx = self._sample_map[sample_ids]
+        marker_idx = self._marker_map[marker_ids]
         return atleast_2d(self._arr[sample_idx,:][:,marker_idx])

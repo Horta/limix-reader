@@ -17,5 +17,5 @@ class MatrixView(MatrixInterface):
     def dtype(self):
         return self._ref.dtype
 
-    def _array(self, sample_idx, marker_idx):
-        return self._ref._array(sample_idx, marker_idx)
+    def _array(self, sample_ids, marker_ids):
+        return self._ref._array(sample_ids, marker_ids)
