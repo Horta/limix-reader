@@ -19,9 +19,15 @@ def test_case1():
     G_hdf5_1 = limr.reader.h5(join(root, 'hdf5-1.h5'), '/G', genotype=True)
     G_hdf5_2 = limr.reader.h5(join(root, 'hdf5-2.h5'), '/G', genotype=True)
 
-    # import ipdb; ipdb.set_trace()
-    # print(G_hdf5_1)
-    # print(G_hdf5_2)
+    G_hdf5_1.sample_ids = limr.fetch.h5(join(root, 'hdf5-1.h5'), '/sample_ids')
+    G_hdf5_2.sample_ids = limr.fetch.h5(join(root, 'hdf5-2.h5'), '/sample_ids')
+
+    G_hdf5_1.marker_ids = limr.fetch.h5(join(root, 'hdf5-1.h5'), '/marker_ids')
+    G_hdf5_2.marker_ids = limr.fetch.h5(join(root, 'hdf5-2.h5'), '/marker_ids')
+
+    print("")
+    print(G_hdf5_1)
+    print(G_hdf5_2)
     # G_hdf5_1.col_header =
 
 # test_case1()

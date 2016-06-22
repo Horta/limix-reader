@@ -11,7 +11,9 @@ from ..util import copyto_nans
 
 class MatrixInterface(object):
     def __init__(self, sample_ids, marker_ids, allelesA, allelesB, shape):
+        self._init_ids(sample_ids, marker_ids, allelesA, allelesB, shape)
 
+    def _init_ids(self, sample_ids, marker_ids, allelesA, allelesB, shape):
         self._sample_map = IdMap(get_ids(sample_ids, shape[0]),
                                  arange(shape[0], dtype=int))
 
@@ -113,6 +115,16 @@ class MatrixInterface(object):
     @property
     def marker_ids(self):
         return self._marker_map.keys()
+
+    @sample_ids.setter
+    def sample_ids(self, v):
+        self._init_ids(v, self.marker_ids, self.allelesA, self.allelesB,
+                       self.shape)
+
+    @marker_ids.setter
+    def marker_ids(self, v):
+        self._init_ids(self.sample_ids, v, self.allelesA, self.allelesB,
+                       self.shape)
 
     def merge(self, that):
         from .mmatrix import MMatrix
