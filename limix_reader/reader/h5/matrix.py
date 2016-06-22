@@ -2,7 +2,7 @@ from numpy import atleast_2d
 
 import h5py as h5
 
-from .interface import MatrixInterface
+from ...matrix import MatrixInterface
 
 class H5Matrix(MatrixInterface):
     def __init__(self, filepath, itempath, sample_ids=None, marker_ids=None,
