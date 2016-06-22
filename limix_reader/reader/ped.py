@@ -1,4 +1,5 @@
 from numpy import unique
+from numpy import asarray
 from numpy import concatenate
 from numpy import nan
 from numpy import empty
@@ -9,7 +10,7 @@ from .plink import read_bim
 from ..table import Table
 from ..matrix import NPyMatrix
 
-def _read_ped_genotype(M):
+def _read_ped_genotype(M, allelesB):
     nsnps = M.shape[1] // 2
     nsamples = M.shape[0]
 
@@ -24,7 +25,7 @@ def _read_ped_genotype(M):
         if len(a) == 0 or len(a) > 2:
             raise ValueError
 
-        allele = a[1]
+        allele = allelesB[i]
 
         G[:,i]  = left == allele
         G[:,i] += right == allele
@@ -32,7 +33,7 @@ def _read_ped_genotype(M):
 
     return G
 
-def _read_ped(filepath):
+def _read_ped(filepath, allelesB):
     column_names = ['family_id', 'individual_id', 'paternal_id', 'maternal_id',
                     'sex', 'phenotype']
     column_types = [bytes, bytes, bytes, bytes, bytes, float]
@@ -50,15 +51,19 @@ def _read_ped(filepath):
     table.index_name = 'sample_id'
 
     df = read_csv(filepath, header=None, sep=r'\s+')
-    G = _read_ped_genotype(df.as_matrix().astype(bytes)[:,6:])
+    G = _read_ped_genotype(df.as_matrix().astype(bytes)[:,6:],
+                           asarray(allelesB))
 
     return (table, G)
 
 def reader(basepath):
-    (sample_tbl, G) = _read_ped(basepath + '.ped')
     marker_tbl = read_bim(basepath + '.bim')
+    (sample_tbl, G) = _read_ped(basepath + '.ped', marker_tbl['alleleB'])
 
-    NPyMatrix(G, sample_ids=sample_tbl.index_values,
-                 marker_ids=marker_tbl.index_values)
+
+    G = NPyMatrix(G, sample_ids=sample_tbl.index_values,
+                     marker_ids=marker_tbl.index_values,
+                     allelesA=marker_tbl['alleleA'],
+                     allelesB=marker_tbl['alleleB'])
 
     return (sample_tbl, marker_tbl, G)

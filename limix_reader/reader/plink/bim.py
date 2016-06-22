@@ -4,7 +4,7 @@ from ...table import Table
 
 def read_bim(filepath):
     column_names = ['chromosome', 'snp_id', 'genetic_distance',
-                    'base_pair_position', 'allele1', 'allele2']
+                    'base_pair_position', 'alleleA', 'alleleB']
     column_types = [bytes, bytes, float, float, bytes, bytes]
 
     df = read_csv(filepath, header=None, sep=r'\s+', names=column_names,
