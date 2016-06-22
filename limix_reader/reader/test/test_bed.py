@@ -84,7 +84,7 @@ def test_read():
     assert_array_equal(G[['1_1', '1_2', '1_3', '2_1', '2_2', '2_3'], '1_snp1'], atleast_2d(R[:,0]).T)
     assert_array_equal(G[['1_1', '1_2', '1_3', '2_1', '2_2', '2_3'], '1_snp2'], atleast_2d(R[:,1]).T)
     assert_array_equal(G[['1_1', '1_2', '1_3', '2_1', '2_2', '2_3'], '1_snp3'], atleast_2d(R[:,2]).T)
-    
+
 
     assert_string_equal(stable['family_id']['1_1'], '1')
     assert_string_equal(stable['family_id']['2_1'], '2')
@@ -96,5 +96,5 @@ def test_read():
     assert_equal(mtable['base_pair_position']['1_snp1'], 1.0)
     assert_equal(mtable['base_pair_position']['1_snp2'], 2.0)
     assert_equal(mtable['base_pair_position']['1_snp3'], 3.0)
-    #
-    # assert_array_equal(asarray(G), R)
+
+    assert_array_equal(asarray(G), R)
