@@ -14,14 +14,6 @@ class MatrixView(MatrixInterface):
         return self._ref.item(sample_id, marker_id)
 
     @property
-    def shape(self):
-        return (len(self._sample_ids), len(self._marker_ids))
-
-    @property
-    def ndim(self):
-        return 2
-
-    @property
     def dtype(self):
         return self._ref.dtype
 

@@ -6,3 +6,4 @@ from .list import list_transpose
 from .scalar import isscalar
 from .ndict import ndict
 from .copyto import copyto_nans
+from .idmap import IdMap
