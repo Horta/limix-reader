@@ -41,6 +41,9 @@ class Table(object):
             return Column(colname, self.index_values, self._df[colname].values)
         return Table(self._df[colname])
 
+    def __setitem__(self, colname, value):
+        raise NotImplementedError
+
     def loc(self, index_values):
         pass
         # index_values = make_sure_list(index_values)

@@ -26,8 +26,12 @@ def test_case1():
     G_hdf5_2.marker_ids = limr.fetch.h5(join(root, 'hdf5-2.h5'), '/marker_ids')
 
     print("")
-    print(G_hdf5_1)
-    print(G_hdf5_2)
+    # print(G_hdf5_1)
+    # print(G_hdf5_2)
     # G_hdf5_1.col_header =
+
+    ped = limr.reader.ped(join(root, 'example'))
+    import ipdb; ipdb.set_trace()
+    pass
 
 # test_case1()

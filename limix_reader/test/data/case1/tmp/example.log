@@ -1,0 +1,27 @@
+PLINK v1.90b3.38 64-bit (7 Jun 2016)
+Options in effect:
+  --file example.bed
+  --make-bed
+  --out example
+
+Hostname: reborn
+Working directory: /Users/horta/workspace/limix-reader/limix_reader/test/data/case1/tmp
+Start time: Sun Jun 26 19:58:27 2016
+
+Random number seed: 1466967507
+16384 MB RAM detected; reserving 8192 MB for main workspace.
+Scanning .ped file... done.
+Performing single-pass .bed write (12 variants, 30 people).
+--file: example-temporary.bed + example-temporary.bim + example-temporary.fam
+written.
+12 variants loaded from .bim file.
+30 people (30 males, 0 females) loaded from .fam.
+Using 1 thread (no multithreaded calculations invoked).
+Before main variant filters, 0 founders and 30 nonfounders present.
+Calculating allele frequencies... done.
+Total genotyping rate is 0.736111.
+12 variants and 30 people pass filters and QC.
+Note: No phenotypes present.
+--make-bed to example.bed + example.bim + example.fam ... done.
+
+End time: Sun Jun 26 19:58:27 2016
