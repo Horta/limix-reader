@@ -31,7 +31,7 @@ def setup_package():
         install_requires=install_requires,
         setup_requires=setup_requires,
         tests_require=tests_require,
-        # cffi_modules=["lim/reader/cplink/bed.py:ffi"],
+        cffi_modules=["limix_reader/reader/plink/cbed/interface.py:ffi"],
         include_package_data=True,
     )
 

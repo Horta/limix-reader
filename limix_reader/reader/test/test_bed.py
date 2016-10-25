@@ -1,32 +1,33 @@
-# from os.path import dirname
-# from os.path import join
-# from os.path import realpath
-#
-# from numpy import array
-# from numpy import asarray
-# from numpy import atleast_2d
-# from numpy import nan
-# from numpy.testing import assert_equal
-# from numpy.testing import assert_array_equal
-# from numpy.testing import assert_string_equal
-#
-# def test_read():
-#     from ..bed import reader
-#
-#     root = dirname(realpath(__file__))
-#     root = join(root, 'data')
-#
-#     (stable, mtable, G) = reader(join(root, 'plink', 'test'))
-#     R = array([[ 0.,  2.,  2.],
-#                [  2.,  nan,   1.],
-#                [ nan,   1.,   1.],
-#                [  2.,   2.,  nan],
-#                [  2.,   2.,  nan],
-#                [ 2.,  2.,  0.]])
-#
-#     assert_equal(G.item('1_1', '1_snp1'), R[0,0])
-#     assert_equal(G.item('1_1', '1_snp2'), R[0,1])
-#     assert_equal(G.item('1_1', '1_snp3'), R[0,2])
+from os.path import dirname
+from os.path import join
+from os.path import realpath
+
+from numpy import array
+from numpy import asarray
+from numpy import atleast_2d
+from numpy import nan
+from numpy.testing import assert_equal
+from numpy.testing import assert_array_equal
+from numpy.testing import assert_string_equal
+
+def test_read():
+    from limix_reader.reader.bed import reader
+
+    root = dirname(realpath(__file__))
+    root = join(root, 'data')
+
+    (stable, mtable, G) = reader(join(root, 'plink', 'test'))
+    R = array([[ 0.,  2.,  2.],
+               [  2.,  nan,   1.],
+               [ nan,   1.,   1.],
+               [  2.,   2.,  nan],
+               [  2.,   2.,  nan],
+               [ 2.,  2.,  0.]])
+
+    v = G.item('1_1', '1_snp1')
+    # assert_equal(G.item('1_1', '1_snp1'), R[0,0])
+    # assert_equal(G.item('1_1', '1_snp2'), R[0,1])
+    # assert_equal(G.item('1_1', '1_snp3'), R[0,2])
 #
 #     assert_equal(G.item('1_2', '1_snp1'), R[1,0])
 #     assert_equal(G.item('1_2', '1_snp2'), R[1,1])
