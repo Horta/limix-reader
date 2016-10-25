@@ -9,7 +9,7 @@
 # from numpy.testing import assert_equal
 # from numpy.testing import assert_raises
 # from numpy.testing import assert_array_equal
-# 
+#
 # import limix_reader as limr
 #
 # def test_ids():
@@ -78,7 +78,6 @@
 #                        ped_sample_tbl.index_values)
 #     assert_array_equal(bed_sample_tbl.columns, ped_sample_tbl.columns)
 #
-#     import ipdb; ipdb.set_trace()
 #     ped_marker_tbl = ped_marker_tbl[bed_marker_tbl.columns]
 #     ped_marker_tbl.index_name
 #     assert_array_equal(bed_marker_tbl, ped_marker_tbl)

@@ -31,7 +31,6 @@ def test_case1():
     # G_hdf5_1.col_header =
 
     ped = limr.reader.ped(join(root, 'example'))
-    import ipdb; ipdb.set_trace()
     pass
 
 # test_case1()

@@ -88,7 +88,6 @@ def _read_ped(filepath, allelesB):
 
 def reader(basepath, allelesB=None):
     marker_tbl = read_map(basepath + '.map')
-    import ipdb; ipdb.set_trace()
     (sample_tbl, G, allelesA, allelesB) =\
         _read_ped(basepath + '.ped', allelesB)
 

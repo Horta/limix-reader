@@ -1,32 +1,8 @@
-from __future__ import division, print_function
 import os
 import sys
-from setuptools import setup
-from setuptools import find_packages
 
-PKG_NAME = 'limix_reader'
-VERSION  = '0.0.1'
+from setuptools import find_packages, setup
 
-def module_exists(module_name):
-    try:
-        __import__(module_name)
-    except ImportError:
-        return False
-    else:
-        return True
-
-def write_version():
-    cnt = """
-# THIS FILE IS GENERATED FROM %(package_name)s SETUP.PY
-version = '%(version)s'
-"""
-    filename = os.path.join(PKG_NAME, 'version.py')
-    a = open(filename, 'w')
-    try:
-        a.write(cnt % {'version': VERSION,
-                       'package_name': PKG_NAME.upper()})
-    finally:
-        a.close()
 
 def setup_package():
     src_path = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -34,28 +10,36 @@ def setup_package():
     os.chdir(src_path)
     sys.path.insert(0, src_path)
 
-    write_version()
+    needs_pytest = {'pytest', 'test', 'ptr'}.intersection(sys.argv)
+    pytest_runner = ['pytest-runner'] if needs_pytest else []
 
-    install_requires = ['cffi>=1.0.0', 'bidict']
-    setup_requires = ['cffi>=1.0.0']
+    setup_requires = ['cffi>=1.6'] + pytest_runner
+    install_requires = ['pytest', 'numpy>=1.9', 'cffi>=1.6',
+                        'h5py>=2.6', 'pandas>=0.18', 'nose>=1.3',
+                        'tabulate>=0.7', 'six']
+    tests_require = install_requires
 
     metadata = dict(
-        name=PKG_NAME,
-        version=VERSION,
-        maintainer="Limix Developers",
-        maintainer_email = "horta@ebi.ac.uk",
-        license="BSD",
-        url='http://pmbio.github.io/limix/',
-        test_suite='setup.get_test_suite',
+        name='limix_reader',
+        version='1.0.0',
+        maintainer="Danilo Horta",
+        maintainer_email="horta@ebi.ac.uk",
+        license="MIT",
+        url='http://github.com/Horta/limix-reader',
         packages=find_packages(),
-        zip_safe=True,
+        zip_safe=False,
         install_requires=install_requires,
         setup_requires=setup_requires,
-        cffi_modules=["limix_reader/reader/plink/cbed/interface.py:ffi"],
+        tests_require=tests_require,
+        # cffi_modules=["lim/reader/cplink/bed.py:ffi"],
+        include_package_data=True,
     )
 
-    if module_exists("distutils.command.bdist_conda"):
+    try:
         from distutils.command.bdist_conda import CondaDistribution
+    except ImportError:
+        pass
+    else:
         metadata['distclass'] = CondaDistribution
         metadata['conda_buildnum'] = 1
         metadata['conda_features'] = ['mkl']
@@ -67,9 +51,4 @@ def setup_package():
         os.chdir(old_path)
 
 if __name__ == '__main__':
-    if not module_exists("numpy"):
-        print("Error: numpy package couldn't be found." +
-              " Please, install it first so I can proceed.")
-        sys.exit(1)
-
     setup_package()
